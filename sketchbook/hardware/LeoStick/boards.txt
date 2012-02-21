@@ -1,0 +1,16 @@
+##############################################################
+leostick.name=Freetronics LeoStick
+leostick.upload.protocol=arduino
+leostick.upload.maximum_size=28672
+leostick.upload.speed=1200
+leostick.bootloader.low_fuses=0xde
+leostick.bootloader.high_fuses=0xd8
+leostick.bootloader.extended_fuses=0xcb
+leostick.bootloader.path=diskloader
+leostick.bootloader.file=DiskLoader-LeoStick.hex
+leostick.bootloader.unlock_bits=0x3F
+leostick.bootloader.lock_bits=0x2F
+leostick.build.mcu=atmega32u4
+leostick.build.f_cpu=16000000L
+leostick.build.core=arduino
+leostick.build.variant=leostick
