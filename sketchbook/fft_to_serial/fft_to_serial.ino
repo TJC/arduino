@@ -1,10 +1,15 @@
 #include <fix_fft.h>
 
-char im[128];
-char data[128];
+#define MIC_INPUT_PIN A2
+#define NUM_SAMPLES 128
+#define HALF_NUM_SAMPLES 64
+#define NUM_SAMPLES_PWR_TWO 7
+
+char im[NUM_SAMPLES];
+char data[NUM_SAMPLES];
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(38400);
   pinMode(13, OUTPUT);
   pinMode(9, OUTPUT);
   digitalWrite(13, LOW);
@@ -17,8 +22,8 @@ void loop() {
   int val;
   
    if (millis() > tt){
-    if (i < 128){
-      val = analogRead(A5);
+    if (i < NUM_SAMPLES){
+      val = analogRead(MIC_INPUT_PIN);
       data[i] = val / 4 - 128;
       im[i] = 0;
       i++;  
@@ -26,9 +31,9 @@ void loop() {
     }
     else{
       //this could be done with the fix_fftr function without the im array.
-      fix_fft(data,im,7,0);
+      fix_fft(data, im, NUM_SAMPLES_PWR_TWO, 0);
       // I am only interested in the absolute value of the transformation
-      for (i=0; i< 64;i++){
+      for (i=0; i < HALF_NUM_SAMPLES;i++){
          data[i] = sqrt(data[i] * data[i] + im[i] * im[i]);
       }
 
@@ -116,7 +121,7 @@ void show_fft_full() {
      Serial.write(27);   // Print "esc"
      Serial.print("[2J");     // Clear screen
       
-      for (int i=0; i < 64; i++) {
+      for (int i=0; i < HALF_NUM_SAMPLES; i++) {
         Serial.print(i * 8, DEC); // 7.8 Hz per step
         if (i < 2) { Serial.print("  "); }
         else { Serial.print(" "); }
