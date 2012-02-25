@@ -24,7 +24,9 @@ void loop() {
    if (millis() > tt){
     if (i < NUM_SAMPLES){
       val = analogRead(MIC_INPUT_PIN);
+      // that returns 0-1023, so convert to a signed byte:
       data[i] = val / 4 - 128;
+      // data[i] = val - 512; // see if this works better for low volumes?
       im[i] = 0;
       i++;  
       
@@ -37,10 +39,12 @@ void loop() {
          data[i] = sqrt(data[i] * data[i] + im[i] * im[i]);
       }
 
-      // show_fft_q();
+      show_fft_q();
 
       digitalWrite(13, check_average_rest() ? HIGH : LOW);
       digitalWrite(9, check_average_bass() ? HIGH : LOW);
+      
+      i = 0; // reset for next sample-taking..
     }
     
     tt = millis();
@@ -53,8 +57,8 @@ void loop() {
 int rolling_avg_bass = 0;
 int check_average_bass() {
   int bass_max = 0;
-  // first two bands are always fucked.. why?
-  for (int i=2; i < 11; i++) {
+
+  for (int i=0; i < 12; i++) {
      if (data[i] > bass_max) {
         bass_max = data[i];
      }
@@ -76,8 +80,8 @@ int check_average_bass() {
 int rolling_avg_rest = 0;
 int check_average_rest() {
   int val_max = 0;
-  // first two bands are always fucked.. why?
-  for (int i=12; i < 62; i++) {
+
+  for (int i=12; i < HALF_NUM_SAMPLES; i++) {
      if (data[i] > val_max) {
         val_max = data[i];
      }
@@ -102,8 +106,7 @@ void show_fft_q() {
      Serial.write(27);   // Print "esc"
      Serial.print("[2J");     // Clear screen
       
-      // The first two bands are always fucked, don't know why.
-      for (int i=2; i < 61; i+=3) {
+      for (int i=0; i < 61; i+=3) {
         datagg = (data[i] + data[i+1] + data[i+2]) / 3;
         Serial.print(int((i+1) * 7.8), DEC); // 7.8 Hz per step
         Serial.print(" ");
