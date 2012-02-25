@@ -39,7 +39,7 @@ void loop() {
          data[i] = sqrt(data[i] * data[i] + im[i] * im[i]);
       }
 
-      show_fft_q();
+      // show_fft_q();
 
       digitalWrite(13, check_average_rest() ? HIGH : LOW);
       digitalWrite(9, check_average_bass() ? HIGH : LOW);
@@ -54,9 +54,9 @@ void loop() {
 // Given the current histogram, keep a rolling average of max value of all
 // bands up to 100 Hz.
 // Return true if current sample exceeds the average*1.3
-int rolling_avg_bass = 0;
+unsigned int rolling_avg_bass = 0;
 int check_average_bass() {
-  int bass_max = 0;
+  unsigned int bass_max = 0;
 
   for (int i=0; i < 12; i++) {
      if (data[i] > bass_max) {
@@ -77,9 +77,9 @@ int check_average_bass() {
   return(0);
 }
 
-int rolling_avg_rest = 0;
+unsigned int rolling_avg_rest = 0;
 int check_average_rest() {
-  int val_max = 0;
+  unsigned int val_max = 0;
 
   for (int i=12; i < HALF_NUM_SAMPLES; i++) {
      if (data[i] > val_max) {
