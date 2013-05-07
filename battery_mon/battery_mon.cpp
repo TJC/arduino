@@ -78,8 +78,10 @@ void loop() {
     // Using a voltage divider means we get a third of the real
     // value; thus, taking three readings brings us up to the
     // actual. Then we divide by 1024 to get the actual voltage.
+    // And of course, multiply by 5.
 
-    voltage = float(accval)/1024.0;
+    voltage = 5.0 * float(accval) / 1024.0;
+    // hopefully compiler optimises that to just /204.8
 
     Serial.print("Voltage: ");
     Serial.println(voltage); // automatically fixed to 2 decimal places
