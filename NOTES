@@ -1,0 +1,15 @@
+This package provides a makefile for building and uploading
+programs from the command line:
+aptitude install arduino-mk
+
+See apps/Makefile for setup.
+
+Note that I need to copy sketchbook/hardware/leostick info to
+/usr/share/arduino/.../hardware though and add boards to boards
+(see boards.txt here)
+
+I had to add this to udev rules.d, in:
+77-mm-usb-device-blacklist.rules
+
+ATTRS{idVendor}=="20a0", ENV{ID_MM_DEVICE_IGNORE}="1"
+
