@@ -1,2 +1,4 @@
 The LeoStick PWM pins are:
-3, 5, 6, 9, 10, 11, 13
+3, 5, 9, 10, 11
+
+analogWrite(pin, value);
