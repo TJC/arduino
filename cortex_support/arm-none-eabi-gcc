@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @args = @ARGV;
+my $real = $0 . ".real";
+
+if (grep { /cortex.m/ } @args) {
+    my @new_args = grep { ! /^\-lm$/ } @args;
+    push @new_args, "-L/home/tobyc/git/arduino/lib", "-larm_cortexM4l_math", "-lm";
+    @args = @new_args;
+}
+
+system($real, @args);
+exit($? >> 8);
