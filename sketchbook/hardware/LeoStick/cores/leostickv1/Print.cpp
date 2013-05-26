@@ -27,6 +27,8 @@
 
 #include "Print.h"
 
+typedef char PROGMEM prog_char;
+
 // Public Methods //////////////////////////////////////////////////////////////
 
 /* default implementation: may be overridden */

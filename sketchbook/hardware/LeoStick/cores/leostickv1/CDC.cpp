@@ -25,9 +25,9 @@
 
 void Reboot()
 {
-	USB.detach();
-	cli();
-	asm volatile("jmp 0x7800");		// jump to bootloader - DiskLoader takes up last 2 kB
+  delay(250);
+  cli();
+  asm volatile("jmp 0x7800");		// jump to bootloader - DiskLoader takes up last 2 kB
 }
 
 typedef struct
@@ -92,10 +92,12 @@ bool WEAK CDC_Setup(Setup& setup)
 
 		if (CDC_SET_CONTROL_LINE_STATE == r)
 		{
-			if (0 != _usbLineInfo.lineState && 1200 == _usbLineInfo.dwDTERate)	// auto-reset is triggered when the port, already open at 1200 bps, is closed
-				Reboot();
-			_usbLineInfo.lineState = setup.wValueL;
-			return true;
+                  _usbLineInfo.lineState = setup.wValueL;
+                  if(1200 == _usbLineInfo.dwDTERate && (_usbLineInfo.lineState & 0x01) == 0) {
+                    // auto-reset is triggered when the port, already open at 1200 bps, is closed
+                    Reboot();
+                  }
+                  return true;
 		}
 	}
 	return false;

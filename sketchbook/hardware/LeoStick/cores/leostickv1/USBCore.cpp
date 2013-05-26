@@ -51,16 +51,12 @@ const u16 STRING_LANGUAGE[2] = {
 
 const u16 STRING_IPRODUCT[17] = {
 	(3<<8) | (2+2*16),
-#if USB_PID == USB_PID_LEONARDO	
-	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
-#elif USB_PID == USB_PID_MICRO
-	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
-#endif
+	'L','e','o','S','t','i','c','k',' ','v','1',' ',' ',' ',' ',' '
 };
 
 const u16 STRING_IMANUFACTURER[12] = {
 	(3<<8) | (2+2*11),
-	'A','r','d','u','i','n','o',' ','L','L','C'
+	'F','r','e','e','t','r','o','n','i','c','s'
 };
 
 #ifdef CDC_ENABLED

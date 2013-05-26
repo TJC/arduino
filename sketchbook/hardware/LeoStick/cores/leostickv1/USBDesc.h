@@ -17,7 +17,7 @@
 */
 
 #define CDC_ENABLED
-#define HID_ENABLED
+//#define HID_ENABLED
 
 
 #ifdef CDC_ENABLED
@@ -62,6 +62,4 @@
 #define IPRODUCT		2
 #define USB_PID_LEONARDO 0x0034
 #define USB_PID_MICRO 0x0035
-#define USB_VID 0x2341	// arduino LLC vid
-#define USB_PID	ARDUINO_MODEL_USB_PID	
 

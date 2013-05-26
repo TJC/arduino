@@ -1,0 +1,13 @@
+Caterina bootloader, built as v2.1 of LeoStick bootloader
+
+Builds against LUFA version 111009
+make version 3.81
+avrdude version 5.11.1
+
+All AVR tools except avrdude were installed by Ubuntu Quantal 12.10
+avr-gcc version 4.7.0 (GCC)
+Thread model: single
+Configured with: ../src/configure -v --enable-languages=c,c++ --prefix=/usr/lib --infodir=/usr/share/info --mandir=/usr/share/man --bindir=/usr/bin --libexecdir=/usr/lib --libdir=/usr/lib --enable-shared --with-system-zlib --enable-long-long --enable-nls --without-included-gettext --disable-libssp --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=avr
+avr-libc version 1.8.0
+binutils version 2.20.1-3
+
