@@ -5,6 +5,7 @@
 
 void timer_callback();
 void display_output();
+inline void restart_my_timer();
 
 const int ledPin = 13;
 const short MAX_SAMPLES = 256;
@@ -32,20 +33,29 @@ void setup() {
   if (arm_cfft_radix4_init_f32(&fft_inst, MAX_SAMPLES, ifftFlag, doBitReverse) != ARM_MATH_SUCCESS) {
     my_error("math failure (fftlen?");
   }
-  
+
+  restart_my_timer();
+}
+
+inline void restart_my_timer() {
   // 5,000,000 = 5 seconds
   // 250,000 = 1/4 sec?
+  // 325 = ~3000 Hz  
   // 80 = ~12500 Hz  
 
-  // We only get 256 samples, and I'd like those to be spread out enough to
-  // detect 25 Hz signals, which I think means spreading those 256 samples
-  // out over a ~12Hz period, at least.
-  // So I make the interval between samples to be:
-  // 1000000 / 12 / 256 = 325.52
+  /*
+  We only get 256 samples, and I'd like those to be spread out enough to
+  detect 25 Hz signals, which I think means spreading those 256 samples
+  out over a ~12Hz period, at least.
+  So I make the interval between samples to be:
+  1000000 / 12 / 256 = 325.52
+  but that'll only let us detect audio upto about 1500 hz, which is shite!
+  so how about aiming for a 20hz base instead, which gives us interval=200
+  That's 5000hz, so nyquist=2500hz.
+  I think I really need to get 1024-sample-sizes working
+  */
 
-  // If we move up to 1024 samples, then it's be an 80 interval instead.
-
-  timer1.begin(timer_callback, 325);
+  timer1.begin(timer_callback, 200);
 }
 
 
@@ -77,19 +87,22 @@ void my_error(const char *str) {
 }
 
 void loop() {
-  
-  digitalWrite(ledPin, HIGH);   // set the LED on
 
-  if (analSamps <= 0) {
+  if (analSamps < MAX_SAMPLES) {
     return;
   }
 
-  short int i;
-  for (i=0; i<MAX_SAMPLES*2; i+=2) {
+  // pause the timer while we copy the array to
+  // something non-volatile and complex
+  timer1.end();
+
+  for (short int i=0; i<MAX_SAMPLES*2; i+=2) {
     complexSamples[i] = float32_t(samples[i]) / 32768.0;
     complexSamples[i+1] = 0.0;
     // complexSamples[i+1] = 0x8000; // fract15 version of zero
   }
+
+  restart_my_timer();
   
   /*
   if (analSamps < MAX_SAMPLES) {
@@ -106,10 +119,7 @@ void loop() {
   
   analSamps = 0;
   
-  digitalWrite(ledPin, LOW);    // set the LED off
-
-  delay(20);
-
+  delay(10); // or should I just loop?
 }
 
 
