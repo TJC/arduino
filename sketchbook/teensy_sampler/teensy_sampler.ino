@@ -29,7 +29,7 @@ void setup() {
   digitalWrite(ledPin, LOW);   // set the LED on
   Serial.println("Starting...");
 
-  if (arm_cfft_radix4_init_f32(&fft_inst, 256, ifftFlag, doBitReverse) != ARM_MATH_SUCCESS) {
+  if (arm_cfft_radix4_init_f32(&fft_inst, MAX_SAMPLES, ifftFlag, doBitReverse) != ARM_MATH_SUCCESS) {
     my_error("math failure (fftlen?");
   }
   
@@ -37,7 +37,15 @@ void setup() {
   // 250,000 = 1/4 sec?
   // 80 = ~12500 Hz  
 
-  timer1.begin(timer_callback, 80);
+  // We only get 256 samples, and I'd like those to be spread out enough to
+  // detect 25 Hz signals, which I think means spreading those 256 samples
+  // out over a ~12Hz period, at least.
+  // So I make the interval between samples to be:
+  // 1000000 / 12 / 256 = 325.52
+
+  // If we move up to 1024 samples, then it's be an 80 interval instead.
+
+  timer1.begin(timer_callback, 325);
 }
 
 
@@ -84,7 +92,7 @@ void loop() {
   }
   
   /*
-  if (analSamps < 256) {
+  if (analSamps < MAX_SAMPLES) {
     for (i=analSamps*2; i<MAX_SAMPLES*2; i++) {
       complexSamples[i] = 0.0;
     }
@@ -105,8 +113,22 @@ void loop() {
 }
 
 
+// with 256 samples, we'll get 126 outputs, thus:
+const short stride_size = 8;
+short strides[stride_size] = {2, 4, 8, 12, 16, 24, 30, 30};
+
+// For somewhat verbose output:
+// const short stride_size = 21;
+// short strides[stride_size] = {1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8,
+                                 12, 12, 12, 12, 18};
+
+// if bottom three registers are driving the RGB LEDs, and top three
+// driving LED strands, then it might work nicely to do something like:
+// const short stride_size = 6;
+// short strides[stride_size] = {2, 3, 3, 16, 32, 40};
+
+
 float accum;
-short strides[9] = {2, 4, 8, 12, 16, 24, 32, 48, 64};
 short idx;
 short stars;
 char buf[80];
@@ -118,8 +140,9 @@ void display_output() {
   Serial.print("Actual Samples: ");
   Serial.println(analSamps);  
   
-  idx = 0;
-  for (short i=0; i<9; i++) {
+  idx = 1; // Skip 0 as that's the DC component of the wave
+
+  for (short i=0; i<stride_size; i++) {
     accum = 0.0;
     for (short j=0; j<strides[i]; j++) {
       accum += my_cabs(&complexSamples[idx]);
@@ -132,6 +155,7 @@ void display_output() {
     buf[stars] = 0;
     Serial.println(buf);
   }
+
   /*
   for (short i=0; i < 30; i+=2) {
     // complexSamples[i] ^= 1 << 15;
