@@ -55,7 +55,7 @@ inline void restart_my_timer() {
   I think I really need to get 1024-sample-sizes working
   */
 
-  timer1.begin(timer_callback, 200);
+  timer1.begin(timer_callback, 150);
 }
 
 
@@ -119,18 +119,18 @@ void loop() {
   
   analSamps = 0;
   
-  delay(10); // or should I just loop?
+  // delay(10); // or should I just loop?
 }
 
 
 // with 256 samples, we'll get 126 outputs, thus:
-const short stride_size = 8;
-short strides[stride_size] = {2, 4, 8, 12, 16, 24, 30, 30};
+//const short stride_size = 8;
+//short strides[stride_size] = {2, 4, 8, 12, 16, 24, 30, 30};
 
 // For somewhat verbose output:
-// const short stride_size = 21;
-// short strides[stride_size] = {1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8,
-                                 12, 12, 12, 12, 18};
+const short stride_size = 25;
+short strides[stride_size] = {1, 1, 1, 1, 1,1,1,1, 2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8,
+                              12, 12, 12, 12, 14};
 
 // if bottom three registers are driving the RGB LEDs, and top three
 // driving LED strands, then it might work nicely to do something like:
@@ -150,7 +150,7 @@ void display_output() {
   Serial.print("Actual Samples: ");
   Serial.println(analSamps);  
   
-  idx = 1; // Skip 0 as that's the DC component of the wave
+  idx = 2; // Skip 0 as that's the DC component of the wave
 
   for (short i=0; i<stride_size; i++) {
     accum = 0.0;
@@ -158,7 +158,7 @@ void display_output() {
       accum += my_cabs(&complexSamples[idx]);
       idx += 2;
     }
-    stars = int(ceilf(accum / 10.0));
+    stars = round(accum/2.0);
     for (short k=0; k<stars; k++) {
       buf[k] = '=';
     }
