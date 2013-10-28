@@ -4,12 +4,14 @@
 // D13 = red
 // D11 = piezo buzzer
 
-// D6 - toggled here when there's enough power
+// OutputPin* - toggled here when there's enough power
 
-int redled = 13;
+int redled = 17; // RXLED on micro pro
 int greenled = 9;
 int blueled = 10;
 int sensorPin = A1;
+int outputPinA = 5;
+int outputPinB = 6;
 
 void led_setup(int pin) {
     pinMode(pin, OUTPUT);
@@ -19,11 +21,13 @@ void led_setup(int pin) {
 }
 
 void enable_relay() {
-    digitalWrite(6, LOW);
+    digitalWrite(outputPinA, LOW);
+    digitalWrite(outputPinB, LOW);
 }
 
 void disable_relay() {
-    digitalWrite(6, HIGH);
+    digitalWrite(outputPinA, HIGH);
+    digitalWrite(outputPinB, HIGH);
 }
 
 void blank_leds() {
@@ -52,6 +56,8 @@ void flash_one_led(int pin) {
 
 void setup() {
     int leds[3] = { redled, greenled, blueled };
+    pinMode(outputPinA, OUTPUT);
+    pinMode(outputPinB, OUTPUT);
     disable_relay();
     for (int i=0; i<3; i++) {
         led_setup(leds[i]);
