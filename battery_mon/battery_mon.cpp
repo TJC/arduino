@@ -4,12 +4,12 @@
 // D13 = red
 // D11 = piezo buzzer
 
-// D12 - toggled here when there's enough power
+// D6 - toggled here when there's enough power
 
 int redled = 13;
 int greenled = 9;
 int blueled = 10;
-int sensorPin = A0;
+int sensorPin = A1;
 
 void led_setup(int pin) {
     pinMode(pin, OUTPUT);
@@ -19,11 +19,11 @@ void led_setup(int pin) {
 }
 
 void enable_relay() {
-    digitalWrite(12, HIGH);
+    digitalWrite(6, LOW);
 }
 
 void disable_relay() {
-    digitalWrite(12, LOW);
+    digitalWrite(6, HIGH);
 }
 
 void blank_leds() {
