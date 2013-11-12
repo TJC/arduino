@@ -13,3 +13,7 @@ I had to add this to udev rules.d, in:
 
 ATTRS{idVendor}=="20a0", ENV{ID_MM_DEVICE_IGNORE}="1"
 
+
+For boardtypes, my Arduino with the USB Mini connector is type: nano328
+The one I've soldered into the battery monitor is type: micro
+
