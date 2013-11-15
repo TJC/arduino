@@ -56,7 +56,8 @@ void setup() {
     int leds[3] = { redled, greenled, blueled };
     pinMode(outputPinA, OUTPUT);
     pinMode(outputPinB, OUTPUT);
-    disable_relay();
+    disable_relay(outputPinA);
+    disable_relay(outputPinB);
     for (int i=0; i<3; i++) {
         led_setup(leds[i]);
     }
