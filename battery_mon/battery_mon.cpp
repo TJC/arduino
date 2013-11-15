@@ -20,14 +20,12 @@ void led_setup(int pin) {
     digitalWrite(pin, LOW);
 }
 
-void enable_relay() {
-    digitalWrite(outputPinA, LOW);
-    digitalWrite(outputPinB, LOW);
+void enable_relay(int pin) {
+    digitalWrite(pin, LOW);
 }
 
-void disable_relay() {
-    digitalWrite(outputPinA, HIGH);
-    digitalWrite(outputPinB, HIGH);
+void disable_relay(int pin) {
+    digitalWrite(pin, HIGH);
 }
 
 void blank_leds() {
@@ -92,17 +90,22 @@ void loop() {
     Serial.print("Voltage: ");
     Serial.println(voltage); // automatically fixed to 2 decimal places
    
-    if (voltage > 13.0) {
+    if (voltage > 13.1) {
+        // ie. We're charging, so there's lots of sun
+        // So disable the lighting relay.
         flash_one_led(greenled);
-        enable_relay();
+        disable_relay(outputPinA);
+        enable_relay(outputPinB);
     }
     else if (voltage > 12.0) {
         enable_one_led(greenled);
-        enable_relay();
+        enable_relay(outputPinA);
+        enable_relay(outputPinB);
     }
     else if (voltage < 11.5) {
         flash_one_led(redled);
-        disable_relay();
+        disable_relay(outputPinA);
+        disable_relay(outputPinB);
     }
     else {
         // between 11.5 and 12.0:
