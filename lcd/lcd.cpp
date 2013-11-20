@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "LiquidCrystal.h"
 #include <Adafruit_NeoPixel.h>
+#include <math.h>
 
 #define SPEAKERPIN 8
 #define NEOPIN 9
@@ -17,14 +18,11 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(8, NEOPIN, NEO_GRB + NEO_KHZ800);
 
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
-typedef unsigned short ushort;
-typedef unsigned int uint;
-
 unsigned long cur_millis = 0;
 
 /* Returns batshit insane values. WHY?!
 
-const ushort segment_lookup[15] = {
+const uint16_t segment_lookup[15] = {
     16, 32, 48, 96,
     128, 160, 192, 256,
     384, 448, 512, 720,
@@ -33,15 +31,15 @@ const ushort segment_lookup[15] = {
 
 // min returned = 1
 // max returned = 15
-ushort num_segments(ushort val) {
-    ushort i = 0;
+uint16_t num_segments(uint16_t val) {
+    uint16_t i = 0;
     while (val < segment_lookup[i]) { i++; }
     return i+1;  // ie. max will be 15
 }
 */
 
-ushort num_segments(ushort val) {
-    // ushort i;
+uint16_t num_segments(uint16_t val) {
+    // uint16_t i;
     // for (i=0; val < segment_lookup[i]; i++);
     // return(i+1);  // ie. max will be 15
     if (val < 24) { return 1; }
@@ -81,8 +79,8 @@ void setup() {
     colourWipe(strip.Color(0,128,0), 125);
 }
 
-void display_bar_graph(ushort val) {
-    ushort segments; 
+void display_bar_graph(uint16_t val) {
+    uint16_t segments; 
     char buf[40];
     static unsigned long elapsed = 0;
     static unsigned char flash_state = 0;
@@ -116,11 +114,11 @@ void display_bar_graph(ushort val) {
         flash_state = 1;
     }
 
-    for (ushort i=0; i<=segments; i++) {
+    for (uint16_t i=0; i<=segments; i++) {
         buf[i] = '#';
     }
     buf[segments+1] = '>';
-    for (ushort i=segments+2; i<16; i++) {
+    for (uint16_t i=segments+2; i<16; i++) {
         buf[i] = ' '; // blank out previous stuff
     }
     buf[16] = '\0';
@@ -138,7 +136,7 @@ void flash_danger() {
     delay(1000);
 }
 
-void clicker(ushort val) {
+void clicker(uint16_t val) {
     static unsigned long last_click = 0;
     if (cur_millis < last_click + 1050-val) {
         return;
@@ -150,13 +148,73 @@ void clicker(ushort val) {
     last_click = cur_millis + cdelay; // adds some random timing
 }
 
+void cycle_leds(uint16_t val) {
+    static uint8_t next_position = 0;
+    static uint8_t dir_fwd = 0;
+    static unsigned long elapsed = 0;
+    static int8_t colour_adj = 0;
+    static uint8_t colour_dir = 1;
+    int16_t red, green, blue;
+
+    // 0-256, but exponentially
+    // uint16_t expval = int( powf(float(val) / 64.0, 2) );
+    // if (cur_millis - elapsed < (158 - (expval/2))) { return; }
+    
+    uint16_t delayer = 50 + 64 - (num_segments(val) * 4);
+
+    if (cur_millis - elapsed < delayer) { return; }
+    elapsed = cur_millis;
+
+    red = val/8 - colour_adj;
+    green = 128 - (val/8) - colour_adj;
+    // cap values at moderately-high brightness:
+    if (green > 128) { green = 192; }
+    if (red > 128) { red = 192; }
+    // cap underflows from colour_adj
+    if (red < 0) { red = 0; }
+    if (green < 0) { green = 0; }
+
+    uint32_t fillcolour = strip.Color(red, green, 0);
+
+    for (uint8_t i=0; i<8; i++) {
+        strip.setPixelColor(i, fillcolour);
+    }
+    strip.setPixelColor(next_position, strip.Color(0,0,255));
+    strip.show();
+
+    if (dir_fwd) {
+        next_position++;
+        if (next_position > 7) {
+            next_position = 6;
+            dir_fwd = 0;
+        }
+    }
+    else {
+        next_position--;
+        if (next_position > 7) {
+            next_position = 1;
+            dir_fwd = 1;
+        }
+    }
+
+    if (colour_dir) {
+        colour_adj += 3;
+    }
+    else {
+        colour_adj -= 3;
+    }
+    if (colour_adj > 64) { colour_dir = 0; }
+    if (colour_adj <= 3) { colour_dir = 1; }
+}
+
 void loop() {
-    ushort alc;
+    uint16_t alc;
 
     cur_millis = millis();
 
     alc = analogRead(5);
     display_bar_graph(alc);
+    cycle_leds(alc);
     clicker(alc);
 }
 
