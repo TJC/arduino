@@ -1,5 +1,19 @@
 #include "Arduino.h"
 #include "LiquidCrystal.h"
+#include <Adafruit_NeoPixel.h>
+
+#define SPEAKERPIN 8
+#define NEOPIN 9
+
+// Parameter 1 = number of pixels in strip
+// Parameter 2 = pin number (most are valid)
+// Parameter 3 = pixel type flags, add together as needed:
+//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
+//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
+//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
+//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(8, NEOPIN, NEO_GRB + NEO_KHZ800);
 
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
@@ -47,11 +61,24 @@ ushort num_segments(ushort val) {
     else return 15;
 }
 
+// Fill the dots one after the other with a color
+void colourWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, c);
+      strip.show();
+      delay(wait);
+  }
+}
+
 void setup() {
     Serial.begin(38400);
+    strip.begin();
+    strip.show(); // Initialize all pixels to 'off'
     lcd.begin(16,2);
-    pinMode(8, OUTPUT);
-    digitalWrite(8, LOW);
+    pinMode(SPEAKERPIN, OUTPUT);
+    digitalWrite(SPEAKERPIN, LOW);
+
+    colourWipe(strip.Color(0,128,0), 125);
 }
 
 void display_bar_graph(ushort val) {
@@ -117,7 +144,7 @@ void clicker(ushort val) {
         return;
     }
 
-    tone(8, 4000, 5);
+    tone(SPEAKERPIN, 4000, 5);
 
     unsigned int cdelay = rand() % (1250-val);
     last_click = cur_millis + cdelay; // adds some random timing
