@@ -6,6 +6,8 @@
 
 // OutputPin* - toggled here when there's enough power
 
+#define TCDEBUG
+
 int redled = 17; // RXLED on micro pro
 int greenled = 9;
 int blueled = 10;
@@ -69,12 +71,14 @@ void setup() {
     for (int i=0; i<3; i++) {
         led_setup(leds[i]);
     }
+#ifdef TCDEBUG
     Serial.begin(9600);
+#endif
 }
 
 // Low Power Delay.  Drops the system clock
 // to its lowest setting and sleeps for 256*quarterSeconds milliseconds.
-int lpDelay(int quarterSeconds) {
+void lpDelay(int quarterSeconds) {
     int oldClkPr = CLKPR;  // save old system clock prescale
     CLKPR = 0x80;    // Tell the AtMega we want to change the system clock
     CLKPR = 0x08;    // 1/256 prescaler = 60KHz for a 16MHz crystal
@@ -90,14 +94,18 @@ void loop() {
 
     for (int i=0; i<3; i++) {
         rawval = analogRead(sensorPin);
+#ifdef TCDEBUG
         Serial.print("Raw ADC: ");
         Serial.println(rawval);
+#endif
         accval += rawval;
         delay(100);
     }
 
+#ifdef TCDEBUG
     Serial.print("Average ADC: ");
     Serial.println(accval/3.0);
+#endif
 
     // Using a voltage divider means we get a third of the real
     // value; thus, taking three readings brings us up to the
@@ -107,9 +115,11 @@ void loop() {
     voltage = 5.1 * float(accval) / 1024.0;
     // hopefully compiler optimises that to just /204.8
 
+#ifdef TCDEBUG
     Serial.print("Voltage: ");
     Serial.println(voltage); // automatically fixed to 2 decimal places
-   
+#endif  
+
     if (voltage > 13.1) {
         // ie. We're charging, so there's lots of sun
         // So disable the lighting relay.
@@ -135,9 +145,11 @@ void loop() {
     // Delay for longer if we're running on very low power:
     if (voltage < 11.5) {
         lpDelay(15); // quarter seconds
+        delay(100); // but be warned it seems to screw with stuff..
     }
     else {
-        lpDelay(6); // quarter seconds
+        delay(1000); // lpdelay was causing grief
+        // lpDelay(6); // quarter seconds
     }
 }
 
