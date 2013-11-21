@@ -125,15 +125,6 @@ void display_bar_graph(uint16_t val) {
     lcd.print(buf);
 }
 
-void flash_danger() {
-    lcd.setCursor(0, 1);
-    lcd.print("-=== DANGER ===-");
-    delay(1000);
-    lcd.setCursor(0, 1);
-    lcd.print("-===        ===-");
-    delay(1000);
-}
-
 void clicker(uint16_t val) {
     static unsigned long last_click = 0;
     if (cur_millis < last_click + 1050-val) {
