@@ -148,13 +148,24 @@ void clicker(uint16_t val) {
     last_click = cur_millis + cdelay; // adds some random timing
 }
 
+// Actually more like a mangled, offset sine..
+inline static short val_to_led_scale_128(uint16_t val) {
+    if (val < 256) {
+        return 0;
+    }
+    else if (val > 512) {
+        return 128;
+    }
+    return int(128.0 * sinf(1.5707 * float(val-256)/256.0));
+}
+
 void cycle_leds(uint16_t val) {
     static uint8_t next_position = 0;
     static uint8_t dir_fwd = 0;
     static unsigned long elapsed = 0;
     static int8_t colour_adj = 0;
     static uint8_t colour_dir = 1;
-    int16_t red, green, blue;
+    int16_t red, green;
 
     // 0-256, but exponentially
     // uint16_t expval = int( powf(float(val) / 64.0, 2) );
@@ -165,12 +176,13 @@ void cycle_leds(uint16_t val) {
     if (cur_millis - elapsed < delayer) { return; }
     elapsed = cur_millis;
 
-    red = val/8 - colour_adj;
-    green = 128 - (val/8) - colour_adj;
+    red = val_to_led_scale_128(val) - colour_adj;
+    green = val_to_led_scale_128(1023-val) - colour_adj;
+
     // cap values at moderately-high brightness:
-    if (green > 128) { green = 192; }
-    if (red > 128) { red = 192; }
-    // cap underflows from colour_adj
+    if (green > 128) { green = 129; }
+    if (red > 128) { red = 129; }
+    // cap underflows
     if (red < 0) { red = 0; }
     if (green < 0) { green = 0; }
 
@@ -203,7 +215,7 @@ void cycle_leds(uint16_t val) {
     else {
         colour_adj -= 3;
     }
-    if (colour_adj > 64) { colour_dir = 0; }
+    if (colour_adj >= 48) { colour_dir = 0; }
     if (colour_adj <= 3) { colour_dir = 1; }
 }
 
