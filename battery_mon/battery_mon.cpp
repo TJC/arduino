@@ -2,7 +2,7 @@
 // D9 = green
 // D10 = blue
 // D13 = red
-// D11 = piezo buzzer
+// D11 = piezo buzzer on Leostick
 
 // OutputPin* - toggled here when there's enough power
 
@@ -53,7 +53,15 @@ void flash_one_led(int pin) {
 }
 
 void setup() {
-    int leds[3] = { redled, greenled, blueled };
+    int leds[] = { redled, greenled, blueled };
+
+    // Enable INPUT+pull-up on all pins; supposedly can save ~10mA that way.
+    for (int i=0; i <= 19; i++) {
+        pinMode(i, INPUT);
+        digitalWrite(i, HIGH); // enables pull-up on input apparently?
+    }
+
+    // Now setup the ones we actually want to output upon..
     pinMode(outputPinA, OUTPUT);
     pinMode(outputPinB, OUTPUT);
     disable_relay(outputPinA);
@@ -62,6 +70,17 @@ void setup() {
         led_setup(leds[i]);
     }
     Serial.begin(9600);
+}
+
+// Low Power Delay.  Drops the system clock
+// to its lowest setting and sleeps for 256*quarterSeconds milliseconds.
+int lpDelay(int quarterSeconds) {
+    int oldClkPr = CLKPR;  // save old system clock prescale
+    CLKPR = 0x80;    // Tell the AtMega we want to change the system clock
+    CLKPR = 0x08;    // 1/256 prescaler = 60KHz for a 16MHz crystal
+    delay(quarterSeconds);  // since the clock is slowed way down, delay(n) now acts like delay(n*256)
+    CLKPR = 0x80;    // Tell the AtMega we want to change the system clock
+    CLKPR = oldClkPr;    // Restore old system clock prescale
 }
 
 void loop() {
@@ -74,7 +93,7 @@ void loop() {
         Serial.print("Raw ADC: ");
         Serial.println(rawval);
         accval += rawval;
-        delay(200);
+        delay(100);
     }
 
     Serial.print("Average ADC: ");
@@ -113,6 +132,12 @@ void loop() {
         enable_one_led(redled);
     }
 
-    delay(1000);
+    // Delay for longer if we're running on very low power:
+    if (voltage < 11.5) {
+        lpDelay(15); // quarter seconds
+    }
+    else {
+        lpDelay(6); // quarter seconds
+    }
 }
 
