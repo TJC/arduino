@@ -6,6 +6,8 @@
 #define SPEAKERPIN 8
 #define NEOPIN 9
 
+#undef TCDEBUG
+
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
@@ -20,7 +22,7 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 unsigned long cur_millis = 0;
 
-/* Returns batshit insane values. WHY?!
+/*
 
 const uint16_t segment_lookup[15] = {
     16, 32, 48, 96,
@@ -29,18 +31,11 @@ const uint16_t segment_lookup[15] = {
     800, 900, 2000
 };
 
-// min returned = 1
-// max returned = 15
-uint16_t num_segments(uint16_t val) {
-    uint16_t i = 0;
-    while (val < segment_lookup[i]) { i++; }
-    return i+1;  // ie. max will be 15
-}
 */
 
 uint16_t num_segments(uint16_t val) {
     // uint16_t i;
-    // for (i=0; val < segment_lookup[i]; i++);
+    // for (i=0; val > segment_lookup[i]; i++);
     // return(i+1);  // ie. max will be 15
     if (val < 24) { return 1; }
     else if (val < 48) { return 2; }
@@ -69,7 +64,9 @@ void colourWipe(uint32_t c, uint8_t wait) {
 }
 
 void setup() {
+#ifdef TCDEBUG
     Serial.begin(38400);
+#endif
     strip.begin();
     strip.show(); // Initialize all pixels to 'off'
     lcd.begin(16,2);
@@ -92,9 +89,10 @@ void display_bar_graph(uint16_t val) {
 
     segments = num_segments(val);
 
+#ifdef TCDEBUG
     snprintf(buf, 40, "r:%04d seg:%02d", val, segments);
     Serial.println(buf);
-
+#endif
 
     lcd.setCursor(0, 0);
     if (flash_state) {
