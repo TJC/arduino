@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include <avr/power.h>
 // D9 = green
 // D10 = blue
 // D13 = red
@@ -79,12 +80,19 @@ void setup() {
 // Low Power Delay.  Drops the system clock
 // to its lowest setting and sleeps for 256*quarterSeconds milliseconds.
 void lpDelay(int quarterSeconds) {
-    int oldClkPr = CLKPR;  // save old system clock prescale
-    CLKPR = 0x80;    // Tell the AtMega we want to change the system clock
-    CLKPR = 0x08;    // 1/256 prescaler = 60KHz for a 16MHz crystal
+    // clock_div_t previous_speed;
+    // previous_speed = clock_prescale_get();
+
+    delay(16); // required or else shit seems to go wrong
+
+    clock_prescale_set(clock_div_256); // 1/256 speed == 60KHz
+
     delay(quarterSeconds);  // since the clock is slowed way down, delay(n) now acts like delay(n*256)
-    CLKPR = 0x80;    // Tell the AtMega we want to change the system clock
-    CLKPR = oldClkPr;    // Restore old system clock prescale
+
+    //clock_prescale_set(previous_speed); // restore original speed
+    clock_prescale_set(clock_div_1); // back to full speed
+
+    delay(16); // required or else shit seems to go wrong
 }
 
 void loop() {
@@ -145,7 +153,6 @@ void loop() {
     // Delay for longer if we're running on very low power:
     if (voltage < 11.5) {
         lpDelay(15); // quarter seconds
-        delay(100); // but be warned it seems to screw with stuff..
     }
     else {
         delay(1000); // lpdelay was causing grief
