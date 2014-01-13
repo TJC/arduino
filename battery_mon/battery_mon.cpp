@@ -100,28 +100,26 @@ void loop() {
     int rawval;
     float voltage;
 
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<6; i++) {
         rawval = analogRead(sensorPin);
 #ifdef TCDEBUG
         Serial.print("Raw ADC: ");
         Serial.println(rawval);
 #endif
         accval += rawval;
-        delay(100);
+        delay(50);
     }
 
 #ifdef TCDEBUG
     Serial.print("Average ADC: ");
-    Serial.println(accval/3.0);
+    Serial.println(accval/6.0);
 #endif
 
     // Using a voltage divider means we get a third of the real
-    // value; thus, taking three readings brings us up to the
-    // actual. Then we divide by 1024 to get the actual voltage.
-    // And of course, multiply by 5.
-
-    voltage = 5.1 * float(accval) / 1024.0;
-    // hopefully compiler optimises that to just /204.8
+    // value. We then take six readings, though, accumulating them.
+    // Multiply by 5 given that analogRead's 1024=5V
+    // Then finally divide the result out to get to the 12V reading.
+    voltage = float(accval) / float(415.0);
 
 #ifdef TCDEBUG
     Serial.print("Voltage: ");
