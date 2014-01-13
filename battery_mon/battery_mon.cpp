@@ -73,7 +73,7 @@ void setup() {
         led_setup(leds[i]);
     }
 #ifdef TCDEBUG
-    Serial.begin(9600);
+    Serial.begin(38400);
 #endif
 }
 
