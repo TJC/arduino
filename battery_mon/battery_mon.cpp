@@ -15,6 +15,7 @@ int blueled = 10;
 int sensorPin = A1;
 int outputPinA = 5;
 int outputPinB = 6;
+bool long_running = false;
 
 void led_setup(int pin) {
     pinMode(pin, OUTPUT);
@@ -58,7 +59,7 @@ void flash_one_led(int pin) {
 void setup() {
     int leds[] = { redled, greenled, blueled };
 
-    // Enable INPUT+pull-up on all pins; supposedly can save ~10mA that way.
+    // Enable INPUT+pull-up on all pins; this does save ~10mA
     for (int i=0; i <= 19; i++) {
         pinMode(i, INPUT);
         digitalWrite(i, HIGH); // enables pull-up on input apparently?
@@ -148,13 +149,17 @@ void loop() {
         enable_one_led(redled);
     }
 
-    // Delay for longer if we're running on very low power:
-    if (voltage < 11.5) {
-        lpDelay(15); // quarter seconds
+    // Delay for longer if we're running on very low power, but only after
+    // we've been running for long enough to reprogram or power settles.
+    if (long_running) {
+        lpDelay(20); // quarter seconds
+    }
+    else if (millis() < 10000) {
+        delay(2000);
     }
     else {
-        delay(1000); // lpdelay was causing grief
-        // lpDelay(6); // quarter seconds
+        long_running = true;
+        lpDelay(20); // quarter seconds
     }
 }
 
