@@ -27,6 +27,24 @@ uint32_t Wheel(byte WheelPos) {
   }
 }
 
+void WheelArray(byte WheelPos, uint8_t *col) {
+    if(WheelPos < 85) {
+        col[0] = WheelPos * 3;
+        col[1] = 255 - WheelPos * 3;
+        col[2] = 0;
+    } else if(WheelPos < 170) {
+        WheelPos -= 85;
+        col[0] = 255;
+        col[1] = 0;
+        col[2] = WheelPos * 3;
+    } else {
+        WheelPos -= 170;
+        col[0] = 0;
+        col[1] = WheelPos * 3;
+        col[2] = 255 - WheelPos * 3;
+    }
+}
+
 
 // Fill the dots one after the other with a color
 void colorWipe(uint32_t c, uint8_t wait) {
@@ -63,39 +81,41 @@ void rainbowCycle(uint8_t wait) {
 }
 
 inline uint16_t abs_led_position(int16_t p) {
-    p = p % NEOLEDCOUNT;
     if (p >= 0) {
-        return (p);
+        return p % NEOLEDCOUNT;
     }
-    return( NEOLEDCOUNT - p );
+    return NEOLEDCOUNT - ( abs(p) % NEOLEDCOUNT );
 }
 
 void spinCycle(uint8_t wait) {
   int16_t i, j; // i will be replaced by millis() later
   int16_t position;
   uint32_t black = strip.Color(0,0,0);
-  uint8_t cr = random(8,255);
-  uint8_t cg = random(8,255);
-  uint8_t cb = random(8,255);
+  uint8_t col[3];
 
-  for (i=0; i < 10000; i++) {
-      position = (i >> 10) % NEOLEDCOUNT;
+
+  for (i=0; i < NEOLEDCOUNT*3; i++) {
+      position = i % NEOLEDCOUNT;
+
+      WheelArray(i%255, col);
 
       // blank stuff out:
-      for (j=-24; j < -7; j++) {
-          strip.setPixelColor(abs_led_position(position + j), black);
+      for (j=32; j > 15; j--) {
+          strip.setPixelColor(abs_led_position(position - j), black);
       }
 
-      strip.setPixelColor(position, cr, cg, cb);
-      for (j=1; j <= 8; j++) {
-          uint32_t c = strip.Color(cr >> j, cb >> j, cb >> j);
+      strip.setPixelColor(position-1, col[0], col[1], col[2]);
+      strip.setPixelColor(position, col[0], col[1], col[2]);
+      strip.setPixelColor(position+1, col[0], col[1], col[2]);
+      for (j=2; j <= 16; j++) {
+          uint32_t c = strip.Color(col[0] >> (j/2), col[1] >> (j/2), col[2] >> (j/2));
           strip.setPixelColor(abs_led_position(position + j), c);
           strip.setPixelColor(abs_led_position(position - j), c);
       }
 
       strip.show();
 
-      delay(wait); // not needed as we base location on millis()
+      delay(wait); // won't needed as we base location on millis()
   }
 }
 
@@ -105,26 +125,20 @@ void setup() {
   randomSeed(analogRead(0));
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
-  strip.setBrightness(32); // start with a conservatively-low brightness
+  // strip.setBrightness(32); // start with a conservatively-low brightness
 }
 
-uint8_t brightness = 30; // initially quite conservative
-
 void loop() {
-  Serial.print("Brightness: ");
-  Serial.println(brightness);
-  strip.setBrightness(brightness);
-  brightness += 10;
-
   // Some example procedures showing how to display to the pixels:
-  colorWipe(strip.Color(255, 0, 0), 50); // Red
-  colorWipe(strip.Color(0, 255, 0), 50); // Green
-  colorWipe(strip.Color(0, 0, 255), 50); // Blue
-  rainbow(20);
-  colorWipe(strip.Color(0, 0, 0), 20); // blank
-  rainbowCycle(20);
-  colorWipe(strip.Color(0, 0, 0), 20); // blank
-  spinCycle(50);
-  colorWipe(strip.Color(0, 0, 0), 20); // blank
+  /*
+  colorWipe(strip.Color(255, 0, 0), 10); 
+  colorWipe(strip.Color(255, 255, 0), 10);
+  colorWipe(strip.Color(0, 255, 255), 10);
+  delay(2000);
+  rainbowCycle(10);
+  */
+
+  Serial.println("starting spin cycle");
+  spinCycle(35);
 }
 
