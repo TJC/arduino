@@ -1,3 +1,6 @@
 [submodule "submodules/Adafruit_NeoPixel"]
 	path = submodules/Adafruit_NeoPixel
 	url = https://github.com/adafruit/Adafruit_NeoPixel.git
+[submodule "submodules/Audio"]
+	path = submodules/Audio
+	url = https://github.com/PaulStoffregen/Audio.git
