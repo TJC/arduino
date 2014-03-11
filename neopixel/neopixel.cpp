@@ -1,8 +1,8 @@
 #include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
 
-#define NEOPIN 2
-#define NEOLEDCOUNT 150
+#define NEOPIN 4
+#define NEOLEDCOUNT 149
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -87,58 +87,65 @@ inline uint16_t abs_led_position(int16_t p) {
     return NEOLEDCOUNT - ( abs(p) % NEOLEDCOUNT );
 }
 
-void spinCycle(uint8_t wait) {
-  int16_t i, j; // i will be replaced by millis() later
-  int16_t position;
-  uint32_t black = strip.Color(0,0,0);
+void spinCycle() {
+  static int16_t i = 0;
+  static uint32_t black = strip.Color(0,0,0);
+  int16_t j, position;
   uint8_t col[3];
 
+  position = i % NEOLEDCOUNT;
 
-  for (i=0; i < NEOLEDCOUNT*3; i++) {
-      position = i % NEOLEDCOUNT;
+  WheelArray(i%255, col);
 
-      WheelArray(i%255, col);
-
-      // blank stuff out:
-      for (j=32; j > 15; j--) {
-          strip.setPixelColor(abs_led_position(position - j), black);
-      }
-
-      strip.setPixelColor(position-1, col[0], col[1], col[2]);
-      strip.setPixelColor(position, col[0], col[1], col[2]);
-      strip.setPixelColor(position+1, col[0], col[1], col[2]);
-      for (j=2; j <= 16; j++) {
-          uint32_t c = strip.Color(col[0] >> (j/2), col[1] >> (j/2), col[2] >> (j/2));
-          strip.setPixelColor(abs_led_position(position + j), c);
-          strip.setPixelColor(abs_led_position(position - j), c);
-      }
-
-      strip.show();
-
-      delay(wait); // won't needed as we base location on millis()
+  // blank stuff out:
+  for (j=32; j > 15; j--) {
+      strip.setPixelColor(abs_led_position(position - j), black);
   }
+
+  strip.setPixelColor(position-1, col[0], col[1], col[2]);
+  strip.setPixelColor(position, col[0], col[1], col[2]);
+  strip.setPixelColor(position+1, col[0], col[1], col[2]);
+  for (j=2; j <= 16; j++) {
+      uint32_t c = strip.Color(col[0] >> (j/2), col[1] >> (j/2), col[2] >> (j/2));
+      strip.setPixelColor(abs_led_position(position + j), c);
+      strip.setPixelColor(abs_led_position(position - j), c);
+  }
+
+  strip.show();
+  i++;
 }
 
+void blank_strip() {
+    for(int i=0; i < NEOLEDCOUNT; i++) {
+      strip.setPixelColor(i, 0, 0, 0);
+    }
+    strip.show();
+}
 
 void setup() {
-  Serial.begin(38400);
+  Serial.begin(115200);
   randomSeed(analogRead(0));
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
-  // strip.setBrightness(32); // start with a conservatively-low brightness
-}
-
-void loop() {
   // Some example procedures showing how to display to the pixels:
-  /*
   colorWipe(strip.Color(255, 0, 0), 10); 
   colorWipe(strip.Color(255, 255, 0), 10);
   colorWipe(strip.Color(0, 255, 255), 10);
-  delay(2000);
+  strip.setBrightness(190); // we can't handle full brightness and white
+  colorWipe(strip.Color(255, 255, 255), 10);
+  strip.setBrightness(220); // we can't handle full brightness and white
   rainbowCycle(10);
-  */
+  blank_strip();
+  strip.setBrightness(255); // we can't handle full brightness and white
+}
+
+void loop() {
 
   Serial.println("starting spin cycle");
-  spinCycle(35);
+  spinCycle();
+  delay(20);
 }
+
+
+
 
