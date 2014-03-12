@@ -4,3 +4,6 @@
 [submodule "submodules/Audio"]
 	path = submodules/Audio
 	url = https://github.com/PaulStoffregen/Audio.git
+[submodule "submodules/Arduino_Makefile_master"]
+	path = submodules/Arduino_Makefile_master
+	url = https://github.com/xxxajk/Arduino_Makefile_master.git
