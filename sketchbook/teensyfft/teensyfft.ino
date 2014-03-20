@@ -5,7 +5,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #define NEOPIN 3
-#define NEOLEDCOUNT 149
+#define NEOLEDCOUNT 146
 
 const int myInput = AUDIO_INPUT_LINEIN;
 //const int myInput = AUDIO_INPUT_MIC;
@@ -14,7 +14,7 @@ const int myInput = AUDIO_INPUT_LINEIN;
 // order data flows, inputs/sources -> processing -> outputs
 //
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
-AudioAnalyzeFFT256  myFFT(20);
+AudioAnalyzeFFT256  myFFT(2);
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
 // Create Audio connections between the components
@@ -102,7 +102,7 @@ void setup() {
   audioShield.volume(60);
 }
 
-int nsum[8] = {1, 2, 4, 8, 16, 32, 64};
+int nsum[8] = {1, 2, 3, 6, 10, 24, 80};
 int oct_out[8];
 
 void loop() {
@@ -162,13 +162,15 @@ void blank_strip() {
 void ledgraph() {
   int offset;
   int colorLevel;
+  int num_bars;
 
   blank_strip();
 
   for (int i=0; i < 8; i++) {
     offset = 16 * i;
     colorLevel = oct_out[i] / 16;
-    for (int j=0; j<16; j++) {
+    num_bars = oct_out[i] / 256;
+    for (int j=0; j<num_bars; j++) {
         if (i == 0) {
           strip.setPixelColor(offset+j, 0, 0, colorLevel);
         }
