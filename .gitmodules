@@ -7,3 +7,6 @@
 [submodule "submodules/Arduino_Makefile_master"]
 	path = submodules/Arduino_Makefile_master
 	url = https://github.com/xxxajk/Arduino_Makefile_master.git
+[submodule "submodules/FastLED"]
+	path = submodules/FastLED
+	url = https://github.com/FastLED/FastLED.git
