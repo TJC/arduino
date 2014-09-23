@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include <Audio.h>
 #include <Wire.h>
-#include <SD.h>
+//#include <SD.h>
 #include <FastLED.h>
 
 #define NEOPIN 3
@@ -16,14 +16,12 @@ const int myInput = AUDIO_INPUT_LINEIN;
 // order data flows, inputs/sources -> processing -> outputs
 //
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
-AudioAnalyzeFFT256  myFFT(3, NULL);
+AudioAnalyzeFFT1024  myFFT;
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
 // Create Audio connections between the components
 //
-AudioConnection c1(audioInput, 0, audioOutput, 0);
-AudioConnection c2(audioInput, 0, myFFT, 0);
-AudioConnection c3(audioInput, 1, audioOutput, 1);
+AudioConnection patchCord1(audioInput, 0, myFFT, 0);
 
 // Create an object to control the audio shield.
 // 
@@ -93,7 +91,12 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(60);
+  audioShield.volume(0.6);
+  
+  myFFT.windowFunction(AudioWindowHanning1024);
+  //myFFT.windowFunction(NULL);
+
+  
 }
 
 int nsum[8] = {1, 2, 3, 6, 10, 24, 80};
@@ -108,14 +111,14 @@ void loop() {
   if (myFFT.available()) {
     // each time new FFT data is available
     for (int i=1; i < 128; i++) {
-      if (myFFT.output[i] > imax) imax = myFFT.output[i];
+      if (myFFT.read(i) > imax) imax = myFFT.read(i);
     }
     if (imax > 99) rolling_avg = (rolling_avg * 0.97) + (double(imax) * 0.03);
 
     divisor = rolling_avg / 255.0;
 
     for (int i=0; i<NEOLEDCOUNT; i++) {
-      j = myFFT.output[i] / divisor;
+      j = myFFT.read(i) / divisor;
       if (j>255) j=255;
       if (j<32) j = 0;
       //strip.setPixelColor(i, j, j, j);
