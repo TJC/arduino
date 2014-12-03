@@ -4,12 +4,24 @@ http://wiki.netduino.com/SainSmart-5V-Relay-Module.ashx
 
 It appears that the four-pin header with GND, IN1, IN2, VCC
 is for receiving 3V3 or 5V signals from the arduino. Note
-that logic is reversed -- high signal = relay on, low signal
-= relay off.
+that logic is reversed -- high signal = relay off, low signal
+= relay on.
 
 The JD-VCC, VCC and GND pins on the other side are for
 driving the actual relays. These want a moderately high current
 5V line. Remove the jumper entirely, and apply power to the GND
 and JD-VCC pins. (It sounds like the jumper is there for if you
 have a 5V controller and don't care about optoisolation)
+
+If driving from a 3V3 controller (eg. Teensy, Beaglebone) then I think
+you need to drive it like this, according to the site:
+
+All GND pins --> to GND
+
+One of JD-VCC and VCC (next to it) will need 5V power, ignore other one.
+Site linked above is wrong, IMO. Check which pin is connected thru to the
+other VCC and leave that one unconnected here.
+
+VCC (input header) -> 3.3V
+Input1, Input2 -> 3v3 signals
 
