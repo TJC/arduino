@@ -108,7 +108,8 @@ void spinCycle() {
   strip.setPixelColor(position, col[0], col[1], col[2]);
   strip.setPixelColor(position+1, col[0], col[1], col[2]);
   for (j=2; j <= 64; j+=2) {
-      uint32_t c = strip.Color(col[0] >> (j/4), col[1] >> (j/4), col[2] >> (j/4));
+      int16_t shifter = j/4;
+      uint32_t c = strip.Color(col[0] >> shifter, col[1] >> shifter, col[2] >> shifter);
       strip.setPixelColor(abs_led_position(position + j), c);
       strip.setPixelColor(abs_led_position(position + j +1 ), c);
       strip.setPixelColor(abs_led_position(position - j), c);
@@ -127,27 +128,21 @@ void blank_strip() {
 }
 
 void setup() {
-  Serial.begin(115200);
   randomSeed(analogRead(0));
+
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
+  delay(1500); // gives us a chance to switch off again with the strip off
 
-  strip.setBrightness(220); // we can't handle full brightness and white
-
+  // strip.setBrightness(220); // we can't handle full brightness and white
   //rainbowCycle(10);
-
-  blank_strip();
-
-  strip.setBrightness(255); // we can't handle full brightness and white
+  //blank_strip();
+  //strip.setBrightness(255); // we can't handle full brightness and white
 }
 
 void loop() {
-
-  //Serial.println("starting spin cycle");
   spinCycle();
   delay(30);
 }
-
-
 
 
