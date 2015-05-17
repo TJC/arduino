@@ -11,7 +11,7 @@
 LiquidCrystal lcd(4, 5, 8,9,10,11);
 
 // the 8 arrays that form each segment of the custom numbers
-const byte bar1[8] = 
+byte bar1[8] = 
 {
         B11000,
         B11100,
@@ -22,7 +22,7 @@ const byte bar1[8] =
         B11100,
         B11000
 };
-const byte bar2[8] =
+byte bar2[8] =
 {
         B00011,
         B00111,
@@ -33,7 +33,7 @@ const byte bar2[8] =
         B00111,
         B00011
 };
-const byte bar3[8] =
+byte bar3[8] =
 {
         B11111,
         B11111,
@@ -44,7 +44,7 @@ const byte bar3[8] =
         B11111,
         B11111
 };
-const byte bar4[8] =
+byte bar4[8] =
 {
         B11110,
         B11100,
@@ -55,7 +55,7 @@ const byte bar4[8] =
         B11000,
         B11100
 };
-const byte bar5[8] =
+byte bar5[8] =
 {
         B01111,
         B00111,
@@ -66,7 +66,7 @@ const byte bar5[8] =
         B00011,
         B00111
 };
-const byte bar6[8] =
+byte bar6[8] =
 {
         B00000,
         B00000,
@@ -77,7 +77,7 @@ const byte bar6[8] =
         B11111,
         B11111
 };
-const byte bar7[8] =
+byte bar7[8] =
 {
         B00000,
         B00000,
@@ -88,7 +88,7 @@ const byte bar7[8] =
         B00111,
         B01111
 };
-const byte bar8[8] =
+byte bar8[8] =
 {
         B11111,
         B11111,
@@ -198,60 +198,7 @@ void narrow1(int col)
   lcd.setCursor(col,1);
   lcd.write(1);
 }
-
-
-void draw1985()
-{
-  lcd.clear();
-  custom1(0);
-  custom9(4);
-  custom8(8);
-  custom5(12);
-}
-
-void draw4JULY()
-{
-  lcd.clear();
-  custom4(0);
-  customJ(5);
-  customU(8);
-  customL(11);
-  custom4(13);
-}
-
-void draw15APR()
-{
-  lcd.clear();
-  narrow1(0);
-  custom5(1);
-  customA(5);
-  customP(9);
-  customR(13);
-}
-
-void draw11SEP()
-{
-  lcd.clear();
-  narrow1(0);
-  narrow1(2);
-  customS(5);
-  customE(9);
-  customP(13);
-}
-
-void drawTime()
-{
-  lcd.clear();
-  custom2(0);
-  custom3(3);
-  lcd.setCursor(7,0);
-  lcd.write(165);
-  lcd.setCursor(7,1);
-  lcd.write(165);
-  custom4(9);
-  custom5(12);
-}
-
+ 
 void setup()
 {
   delay(100);
@@ -273,7 +220,7 @@ void setup()
 void displayWipe() {
   lcd.scrollDisplayLeft();
   for (int i=0; i<16; i++) {
-    delay(80);
+    delay(60);
     lcd.scrollDisplayLeft();
   }
 }
@@ -295,6 +242,9 @@ void loop() {
     lcd.clear();
     displayString(0, messages[i]);
     delay(1500);
+    displayWipe();
+    lcd.clear();
+    delay(500);
   }
 
 }
