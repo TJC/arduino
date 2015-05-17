@@ -1,39 +1,6 @@
 /*
-  LiquidCrystal Library - Hello World
-
- Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
- library works with all LCD displays that are compatible with the
- Hitachi HD44780 driver. There are many of them out there, and you
- can usually tell them by the 16-pin interface.
-
- This sketch prints "Hello World!" to the LCD
- and shows the time.
-
-  The circuit:
- * LCD RS pin to digital pin 12
- * LCD Enable pin to digital pin 11
- * LCD D4 pin to digital pin 5
- * LCD D5 pin to digital pin 4
- * LCD D6 pin to digital pin 3
- * LCD D7 pin to digital pin 2
- * LCD R/W pin to ground
- * LCD VSS pin to ground
- * LCD VCC pin to 5V
- * 10K resistor:
- * ends to +5V and ground
- * wiper to LCD VO pin (pin 3)
-
- Library originally added 18 Apr 2008
- by David A. Mellis
- library modified 5 Jul 2009
- by Limor Fried (http://www.ladyada.net)
- example added 9 Jul 2009
- by Tom Igoe
- modified 22 Nov 2010
- by Tom Igoe
-
- This example code is in the public domain.
-
+ Display back-to-the-future style time and dates on a bunch of
+ HD44780 16x02 LCD displays. Uses a large font style.
  http://www.arduino.cc/en/Tutorial/LiquidCrystal
  */
 
@@ -44,7 +11,7 @@
 LiquidCrystal lcd(4, 5, 8,9,10,11);
 
 // the 8 arrays that form each segment of the custom numbers
-byte bar1[8] = 
+const byte bar1[8] = 
 {
         B11000,
         B11100,
@@ -55,7 +22,7 @@ byte bar1[8] =
         B11100,
         B11000
 };
-byte bar2[8] =
+const byte bar2[8] =
 {
         B00011,
         B00111,
@@ -66,7 +33,7 @@ byte bar2[8] =
         B00111,
         B00011
 };
-byte bar3[8] =
+const byte bar3[8] =
 {
         B11111,
         B11111,
@@ -77,7 +44,7 @@ byte bar3[8] =
         B11111,
         B11111
 };
-byte bar4[8] =
+const byte bar4[8] =
 {
         B11110,
         B11100,
@@ -88,7 +55,7 @@ byte bar4[8] =
         B11000,
         B11100
 };
-byte bar5[8] =
+const byte bar5[8] =
 {
         B01111,
         B00111,
@@ -99,7 +66,7 @@ byte bar5[8] =
         B00011,
         B00111
 };
-byte bar6[8] =
+const byte bar6[8] =
 {
         B00000,
         B00000,
@@ -110,7 +77,7 @@ byte bar6[8] =
         B11111,
         B11111
 };
-byte bar7[8] =
+const byte bar7[8] =
 {
         B00000,
         B00000,
@@ -121,7 +88,7 @@ byte bar7[8] =
         B00111,
         B01111
 };
-byte bar8[8] =
+const byte bar8[8] =
 {
         B11111,
         B11111,
@@ -133,8 +100,56 @@ byte bar8[8] =
         B00000
 };
 
+int bigFont[64][6] = {
+  {2,8,1, 2,6,1},       // 0
+  {32,1,32, 32,1,32},   // 1 (2 col narrow)
+  {5,3,1, 2,6,6},       // 2
+  {5,3,1, 7,6,1},       // 3
+  {2,6,1, 32,32,1},     // 4
+  {2,3,4, 7,6,1},       // 5
+  {2,3,4, 2,6,1},       // 6
+  {2,8,1, 32,32,1},     // 7
+  {2,3,1, 2,6,1},       // 8
+  {2,3,1, 7,6,1},       // 9
+  {32,165,32, 32,165,32}, // :
+  {}, // ;
+  {}, // <
+  {32,6,32, 32,6,32},   // =
+  {}, // >
+  {}, // ?
+  {}, // @
+  {2,3,1, 2,32,1},      // A
+  {}, // B
+  {2,8,8, 2,6,6},       // C
+  {}, // D
+  {2,3,4, 2,6,6},       // E
+  {2,3,4, 2,32,32},     // F
+  {}, // G
+  {2,6,1, 2,32,1},      // H
+  {32,1,32, 32,1,32},   // I (2 col narrow)
+  {32,32,1, 2,6,1},     // J
+  {}, // K
+  {2,32,32, 2,6,32},    // L (2 col narrow)
+  {}, // M
+  {}, // N
+  {2,8,1, 2,6,1},       // O (same as 0)
+  {2,3,1, 2,32,32},     // P
+  {}, // Q
+  {2,3,1, 2,96,164},    // R
+  {2,3,4, 7,6,1},       // S (same as 5)
+  {}, // T
+  {2,32,1, 2,6,1},      // U
+  {}, // V
+  {}, // W
+  {}, // X
+  {2,6,1, 32,32,1},     // Y (same as 4)
+  {}, // Z
+};
+
+
 void customChar(int col, int vals[])
 {
+  if (vals == NULL) { return; }
   lcd.setCursor(col, 0);
   lcd.write(vals[0]);
   lcd.write(vals[1]);
@@ -145,16 +160,34 @@ void customChar(int col, int vals[])
   lcd.write(vals[5]);
 }
 
-void custom0(int col)
-{
-  int c[] = {2,8,1, 2,6,1};
-  customChar(col, c);
-}
-
-void custom1(int col)
-{
-  int c[] = {32,32,1, 32,32,1};
-  customChar(col, c);
+/*
+  displayString -- writes a string of numbers and capital letters to the LCD
+  Params:
+    col -- Initial column to start at. Probably zero for most use.
+  Note:
+    Actual space characters are narrower than the rest.
+  Example:
+    displayString(0, 1, "01:22");
+    displayString(0, 0, "1 9 8 5");
+*/
+void displayString(int col, char *s) {
+    int charval;
+    while (*s != '\0') {
+        charval = *s;
+        if (charval == 32) {
+            col += 1;
+        }
+        else if (charval == 'L' || charval == '1' || charval == 'I') {
+            customChar(col, bigFont[charval-48]);
+            col += 2;
+        }
+        else if (charval >= 48 && charval <= 90) {
+            // ord('0') = 48 and our font array starts at 0
+            customChar(col, bigFont[charval-48]);
+            col += 3;
+        }
+        s++;
+    }
 }
 
 // Narrow version
@@ -164,145 +197,6 @@ void narrow1(int col)
   lcd.write(1);
   lcd.setCursor(col,1);
   lcd.write(1);
-}
-
-void custom2(int col)
-{
-  lcd.setCursor(col,0);
-  lcd.write(5);
-  lcd.write(3);
-  lcd.write(1);
-  lcd.setCursor(col, 1);
-  lcd.write(2);
-  lcd.write(6);
-  lcd.write(6);
-}
-
-
-void custom3(int col)
-{
-  int c[] = {5,3,1, 7,6,1};
-  customChar(col, c);
-}
-
-
-void custom4(int col)
-{
-  lcd.setCursor(col,0);
-  lcd.write(2);
-  lcd.write(6);
-  lcd.write(1);
-  lcd.setCursor(col, 1);
-  lcd.write(32);
-  lcd.write(32);
-  lcd.write(1);
-}
-
-void custom5(int col)
-{
-  lcd.setCursor(col,0);
-  lcd.write(2);
-  lcd.write(3);
-  lcd.write(4);
-  lcd.setCursor(col, 1);
-  lcd.write(7);
-  lcd.write(6);
-  lcd.write(1);
-}
-
-void custom6(int col)
-{
-  lcd.setCursor(col,0);
-  lcd.write(2);
-  lcd.write(3);
-  lcd.write(4);
-  lcd.setCursor(col, 1);
-  lcd.write(2);
-  lcd.write(6);
-  lcd.write(1);
-}
-
-void custom7(int col)
-{
-  lcd.setCursor(col,0);
-  lcd.write(2);
-  lcd.write(8);
-  lcd.write(1);
-  lcd.setCursor(col, 1);
-  lcd.write(32);
-  lcd.write(32);
-  lcd.write(1);
-}
-
-
-void custom8(int col)
-{
-  int c[] = {2,3,1, 2,6,1};
-  customChar(col, c);
-}
-
-
-void custom9(int col)
-{
-  lcd.setCursor(col, 0); 
-  lcd.write(2);  
-  lcd.write(3); 
-  lcd.write(1);
-  lcd.setCursor(col, 1); 
-  lcd.write(7);  
-  lcd.write(6);  
-  lcd.write(1);
-}
-
-void customA(int col)
-{
-  int c[] = {2,3,1, 2,32,1};
-  customChar(col, c);
-}
-
-
-void customE(int col)
-{
-  int c[] = {2,3,4, 2,6,6};
-  customChar(col, c);
-}
-
-
-void customJ(int col)
-{
-  int c[] = {32,32,1, 2,6,1};
-  customChar(col, c);
-}
-
-void customU(int col)
-{
-  int c[] = {2,32,1, 2,6,1};
-  customChar(col, c);
-}
-
-void customL(int col)
-{
-  int c[] = {2,32,32, 2,6,32};
-  customChar(col, c);
-}
-
-void customP(int col)
-{
-  int c[] = {2,3,1, 2,32,32};
-  customChar(col, c);
-}
-
-void customR(int col)
-{
-  int c[] = {2,3,1, 2,96,164};
-  customChar(col, c);
-  //lcd.setCursor(col+1, 1);
-  //lcd.write("\\");
-}
-
-void customS(int col)
-{
-  custom5(col);
 }
 
 
@@ -376,21 +270,32 @@ void setup()
 
 }
 
+void displayWipe() {
+  lcd.scrollDisplayLeft();
+  for (int i=0; i<16; i++) {
+    delay(80);
+    lcd.scrollDisplayLeft();
+  }
+}
+
+char messages[][12] = {
+  "01:22",
+  "15  APR",
+  " 1 9 8 5",
+  "11  SEP",
+  "4 JULY",
+};
+
 void loop() {
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
   // lcd.setCursor(0, 0);
-  drawTime();
-  delay(1500);
-  draw15APR();
-  delay(1500);
-  draw1985();
-  delay(1500);
 
-  //draw11SEP();
-  //delay(1500);
-  //draw4JULY();
-  // lcd.scrollDisplayLeft();
-  //delay(1500);
+  for (int i=0; i<5; i++) {
+    lcd.clear();
+    displayString(0, messages[i]);
+    delay(1500);
+  }
+
 }
 
