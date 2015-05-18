@@ -8,7 +8,9 @@
 #include <LiquidCrystal.h>
 
 // initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(4, 5, 8,9,10,11);
+LiquidCrystal lcd1(4, 5, 8,9,10,11);
+LiquidCrystal lcd2(4, 6, 8,9,10,11);
+LiquidCrystal lcd3(4, 7, 8,9,10,11);
 
 // the 8 arrays that form each segment of the custom numbers
 byte bar1[8] = 
@@ -147,7 +149,7 @@ int bigFont[64][6] = {
 };
 
 
-void customChar(int col, int vals[])
+void customChar(LiquidCrystal lcd, int col, int vals[])
 {
   if (vals == NULL) { return; }
   lcd.setCursor(col, 0);
@@ -170,7 +172,7 @@ void customChar(int col, int vals[])
     displayString(0, 1, "01:22");
     displayString(0, 0, "1 9 8 5");
 */
-void displayString(int col, char *s) {
+void displayString(LiquidCrystal lcd, int col, char *s) {
     int charval;
     while (*s != '\0') {
         charval = *s;
@@ -178,12 +180,12 @@ void displayString(int col, char *s) {
             col += 1;
         }
         else if (charval == 'L' || charval == '1' || charval == 'I') {
-            customChar(col, bigFont[charval-48]);
+            customChar(lcd, col, bigFont[charval-48]);
             col += 2;
         }
         else if (charval >= 48 && charval <= 90) {
             // ord('0') = 48 and our font array starts at 0
-            customChar(col, bigFont[charval-48]);
+            customChar(lcd, col, bigFont[charval-48]);
             col += 3;
         }
         s++;
@@ -191,7 +193,7 @@ void displayString(int col, char *s) {
 }
 
 // Narrow version
-void narrow1(int col)
+void narrow1(LiquidCrystal lcd, int col)
 {
   lcd.setCursor(col,0);
   lcd.write(1);
@@ -199,10 +201,8 @@ void narrow1(int col)
   lcd.write(1);
 }
  
-void setup()
+void setupChars(LiquidCrystal lcd)
 {
-  delay(100);
-  // assignes each segment a write number
   lcd.createChar(1,bar1);
   lcd.createChar(2,bar2);
   lcd.createChar(3,bar3);
@@ -211,13 +211,24 @@ void setup()
   lcd.createChar(6,bar6);
   lcd.createChar(7,bar7);
   lcd.createChar(8,bar8);
-  
-  // sets the LCD's rows and colums:
-  lcd.begin(16, 2);
+}
+
+void setup()
+{
+  delay(100);
+
+    // sets the LCD's rows and colums:
+  lcd1.begin(16, 2);
+  lcd2.begin(16, 2);
+  lcd3.begin(16, 2);
+
+  setupChars(lcd1);
+  setupChars(lcd2);
+  setupChars(lcd3);
 
 }
 
-void displayWipe() {
+void displayWipe(LiquidCrystal lcd) {
   lcd.scrollDisplayLeft();
   for (int i=0; i<16; i++) {
     delay(60);
@@ -237,7 +248,7 @@ void loop() {
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
   // lcd.setCursor(0, 0);
-
+/*
   for (int i=0; i<5; i++) {
     lcd.clear();
     displayString(0, messages[i]);
@@ -246,6 +257,17 @@ void loop() {
     lcd.clear();
     delay(500);
   }
-
+*/
+  lcd1.clear();
+  lcd2.clear();
+  lcd3.clear();
+  displayString(lcd1, 0, messages[0]);
+  displayString(lcd2, 0, messages[1]);
+  displayString(lcd3, 0, messages[2]);
+  delay(1000);
+  displayWipe(lcd1);
+  displayWipe(lcd2);
+  displayWipe(lcd3);
+  
 }
 
