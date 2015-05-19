@@ -7,10 +7,23 @@
 // include the library code:
 #include <LiquidCrystal.h>
 
-// initialize the library with the numbers of the interface pins
-LiquidCrystal lcd1(4, 5, 8,9,10,11);
-LiquidCrystal lcd2(4, 6, 8,9,10,11);
-LiquidCrystal lcd3(4, 7, 8,9,10,11);
+
+// global LCD array
+LiquidCrystal displays[3] = {
+ { 4, 5, 8,9,10,11 },
+ { 4, 6, 8,9,10,11 },
+ { 4, 7, 8,9,10,11 }
+};
+
+/*
+// Requires platform.txt modified to include compile.cpp.flags += -std=gnu++11
+#include <array>
+std::array <LiquidCrystal, 3> displays = {{
+ { 4, 5, 8,9,10,11 },
+ { 4, 6, 8,9,10,11 },
+ { 4, 7, 8,9,10,11 }
+}};
+*/
 
 // the 8 arrays that form each segment of the custom numbers
 byte bar1[8] = 
@@ -225,16 +238,19 @@ void setupChars(LiquidCrystal lcd)
 
 void setup()
 {
-  delay(100);
+  delay(100); // seems to avoid initialisation issues
 
-    // sets the LCD's rows and colums:
-  lcd1.begin(16, 2);
-  lcd2.begin(16, 2);
-  lcd3.begin(16, 2);
+  // initialize the library with the numbers of the interface pins
+  /*
+  displays[0] = new LiquidCrystal(4, 5, 8,9,10,11);
+  displays[1] = new LiquidCrystal(4, 6, 8,9,10,11);
+  displays[2] = new LiquidCrystal(4, 7, 8,9,10,11);
+  */
 
-  setupChars(lcd1);
-  setupChars(lcd2);
-  setupChars(lcd3);
+  for (int i=0; i<3; i++) {
+    displays[i].begin(16, 2);
+    setupChars(displays[i]);
+  }
 
 }
 
@@ -246,38 +262,51 @@ void displayWipe(LiquidCrystal lcd) {
   }
 }
 
-char messages[][12] = {
-  "01:22",
-  "15  APR",
-  " 1 9 8 5",
-  "11  SEP",
-  "4 JULY",
+void clearAllDisplays() {
+  for (int i=0; i<3; i++) {
+    displays[i].clear();
+  }
+}
+
+void wipeAllDisplays() {
+  for (int i=0; i<16; i++) {
+    delay(60);
+    for (int i=0; i<3; i++) {
+      displays[i].scrollDisplayLeft();
+    }
+  }
+}
+
+char messages[][7][12] = {
+  { "00:30", "05  NOV", " 1 6 0 5" },   // guy fawkes discovered
+  { "08:46", "11  SEP", " 2 0 0 1" },   // sep 11 terrorism attack
+  { "01:22", "26  OCT", " 1 9 8 5" },   // back to the future
+  { "10:04", "21  OCT", " 2 0 1 5" },   // back to the future 2
+  { "03:22", "7  JULY", " 1 9 4 7" },   // roswell incident
+  { "08:17", "25  DEC", " 0 0 0 0" },   // birth of christ
+  { "12:29", "22  NOV", " 1 9 6 3" }    // JFK
 };
+
+void do_message(int mId) {
+  clearAllDisplays();
+
+  for (int i=0; i<3; i++) {
+    displayString(displays[i], 0, messages[mId][i]);
+  }
+
+  delay(2000);
+
+  wipeAllDisplays();
+}
 
 void loop() {
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
   // lcd.setCursor(0, 0);
-/*
-  for (int i=0; i<5; i++) {
-    lcd.clear();
-    displayString(0, messages[i]);
-    delay(1500);
-    displayWipe();
-    lcd.clear();
-    delay(500);
+
+  for (int m=0; m<7; m++) {
+    do_message(m);
   }
-*/
-  lcd1.clear();
-  lcd2.clear();
-  lcd3.clear();
-  displayString(lcd1, 0, messages[0]);
-  displayString(lcd2, 0, messages[1]);
-  displayString(lcd3, 0, messages[2]);
-  delay(1000);
-  displayWipe(lcd1);
-  displayWipe(lcd2);
-  displayWipe(lcd3);
   
 }
 
