@@ -10,9 +10,9 @@
 
 // global LCD array
 LiquidCrystal displays[3] = {
+ { 4, 7, 8,9,10,11 },
  { 4, 5, 8,9,10,11 },
- { 4, 6, 8,9,10,11 },
- { 4, 7, 8,9,10,11 }
+ { 4, 6, 8,9,10,11 }
 };
 
 /*
@@ -278,13 +278,13 @@ void wipeAllDisplays() {
 }
 
 char messages[][7][12] = {
-  { "03:22", "7  JULY", " 1 9 4 7" },  // roswell incident
-  { "00:30", "05 NOV", " 1 6 0 5" },   // guy fawkes discovered
-  { "01:22", "26 OCT", " 1 9 8 5" },   // back to the future
-  { "08:46", "11  SEP", " 2 0 0 1" },  // sep 11 terrorism attack
-  { "10:04", "21  OCT", " 2 0 1 5" },  // back to the future 2
-  { "12:29", "22 NOV", " 1 9 6 3" },   // JFK
-  { "08:17", "25 DEC", " 0 0 0 0" },   // birth of christ
+  { "03:22", "JUL  07", " 1 9 4 7" },  // roswell incident
+  { "00:30", "NOV 05", " 1 6 0 5" },   // guy fawkes discovered
+  { "01:22", "OCT 26", " 1 9 8 5" },   // back to the future
+  { "08:46", "SEP  11", " 2 0 0 1" },  // sep 11 terrorism attack
+  { "10:04", "OCT  21", " 2 0 1 5" },  // back to the future 2
+  { "12:29", "NOV 22", " 1 9 6 3" },   // JFK
+  { "08:17", "DEC 25", " 0 0 0 0" },   // birth of christ
 };
 
 void do_message(int mId) {
