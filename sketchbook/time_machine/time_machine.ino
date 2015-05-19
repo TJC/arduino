@@ -278,13 +278,13 @@ void wipeAllDisplays() {
 }
 
 char messages[][7][12] = {
-  { "00:30", "05  NOV", " 1 6 0 5" },   // guy fawkes discovered
-  { "08:46", "11  SEP", " 2 0 0 1" },   // sep 11 terrorism attack
-  { "01:22", "26  OCT", " 1 9 8 5" },   // back to the future
-  { "10:04", "21  OCT", " 2 0 1 5" },   // back to the future 2
-  { "03:22", "7  JULY", " 1 9 4 7" },   // roswell incident
-  { "08:17", "25  DEC", " 0 0 0 0" },   // birth of christ
-  { "12:29", "22  NOV", " 1 9 6 3" }    // JFK
+  { "03:22", "7  JULY", " 1 9 4 7" },  // roswell incident
+  { "00:30", "05 NOV", " 1 6 0 5" },   // guy fawkes discovered
+  { "01:22", "26 OCT", " 1 9 8 5" },   // back to the future
+  { "08:46", "11  SEP", " 2 0 0 1" },  // sep 11 terrorism attack
+  { "10:04", "21  OCT", " 2 0 1 5" },  // back to the future 2
+  { "12:29", "22 NOV", " 1 9 6 3" },   // JFK
+  { "08:17", "25 DEC", " 0 0 0 0" },   // birth of christ
 };
 
 void do_message(int mId) {
@@ -294,7 +294,7 @@ void do_message(int mId) {
     displayString(displays[i], 0, messages[mId][i]);
   }
 
-  delay(2000);
+  delay(3000);
 
   wipeAllDisplays();
 }
