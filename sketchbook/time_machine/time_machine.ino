@@ -300,16 +300,18 @@ void dissolve() {
 }
 
 char messages[][3][12] = {
-  { "00:01", "DEC 25", " 0 0 0 0" },   // birth of christ
-  { "00:30", "NOV 05", " 1 6 0 5" },   // guy fawkes discovered
-  { "03:22", "JUL  07", " 1 9 4 7" },  // roswell incident
-  { "12:29", "NOV 22", " 1 9 6 3" },   // JFK
-  { "15:37", "DEC 06", " 1 9 8 2" },   // Akira incident / WW3
-  { "05:01", "MAY 12", " 1 9 8 4" },   // terminator
-  { "01:22", "OCT 26", " 1 9 8 5" },   // back to the future
-  { "02:14", "AUG 29", " 1 9 9 7" },   // judgement day
-  { "08:46", "SEP  11", " 2 0 0 1" },  // sep 11 terrorism attack
-  { "10:04", "OCT  21", " 2 0 1 5" },  // back to the future 2
+  { " 00:01", "DEC 25", " 0 0 0 0" },   // birth of christ
+  { " 00:30", "NOV 05", " 1 6 0 5" },   // guy fawkes discovered
+  { " 03:22", "JUL  07", " 1 9 4 7" },  // roswell incident
+  { " 10:04", "NOV 12", " 1 9 5 5 " },  // bttf 1
+  { " 12:29", "NOV 22", " 1 9 6 3" },   // JFK
+  { " 18:01", "APR 04", " 1 9 6 8" },   // Martin Luther King
+  { " 15:37", "DEC 06", " 1 9 8 2" },   // Akira incident / WW3
+  { " 05:01", "MAY 12", " 1 9 8 4" },   // terminator
+  { " 01:22", "OCT 26", " 1 9 8 5" },   // back to the future
+  { " 02:14", "AUG 29", " 1 9 9 7" },   // judgement day
+  { " 08:46", "SEP  11", " 2 0 0 1" },  // sep 11 terrorism attack
+  { " 04:29", "OCT  21", " 2 0 1 5" },  // back to the future 2
 };
 
 void do_message(int mId) {
@@ -331,7 +333,7 @@ void loop() {
   // (note: line 1 is the second row, since counting begins with 0):
   // lcd.setCursor(0, 0);
 
-  for (int m=0; m<10; m++) {
+  for (int m=0; m<12; m++) {
     do_message(m);
   }
   
