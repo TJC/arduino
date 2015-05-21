@@ -277,6 +277,28 @@ void wipeAllDisplays() {
   }
 }
 
+void dissolve() {
+  int dseq[32] = { // actually dseq[2][16]
+    2, 11, 6, 15,
+    4, 9, 13, 0,
+    10, 5, 14, 8,
+    1, 12, 3, 7,
+    13, 4, 9, 0,
+    11, 6, 2, 15,
+    5, 10, 1, 7,
+    14, 3, 12, 8
+  };
+  for (int i=0; i<16; i++) {
+    for (int d=0; d<3; d++) {
+      for (int j=0; j<2; j++) {
+        displays[d].setCursor(dseq[j*16 + i], j);
+        displays[d].write(32); // ie. blank space
+        delay(10);
+      }
+    }
+  }
+}
+
 char messages[][3][12] = {
   { "00:01", "DEC 25", " 0 0 0 0" },   // birth of christ
   { "00:30", "NOV 05", " 1 6 0 5" },   // guy fawkes discovered
@@ -299,7 +321,9 @@ void do_message(int mId) {
 
   delay(3000);
 
-  wipeAllDisplays();
+  //wipeAllDisplays();
+  dissolve();
+  delay(500);
 }
 
 void loop() {
