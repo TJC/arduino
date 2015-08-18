@@ -1,6 +1,6 @@
 
 # make show_boards gives a list of board tags
-BOARD_TAG = nano
+BOARD_TAG = nano328
 #ARDUINO_PORT = $(wildcard /dev/ttyACM*)
 #ARDUINO_PORT  ?= /dev/ttyACM* /dev/ttyUSB*
 # Libs are in $(ARDUINO_DIR)/hardware/libraries
