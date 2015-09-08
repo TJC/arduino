@@ -3,23 +3,21 @@
 #include <FastLED.h>
 // Was built against version 3.1
 
-#define LEDPIN 8
+#define LEDPIN 0
 #define LEDCOUNT 150
 
-CRGB leds[LEDCOUNT];
+CRGB leds[LEDCOUNT+1];
 
 ///////////// Test sequence ////////////
 void boot_up() {
   int hue;
-  for (int j=0; j < LEDCOUNT; j++) {
-    for (int i=0; i < j; i++) {
-      hue = (i * 4)%256;
-      leds[i] = CHSV(hue, 255, 128);
-    }
+  for (int i=0; i < LEDCOUNT; i++) {
+    hue = (i * 4)%256;
+    leds[i] = CHSV(hue, 255, 128);
     FastLED.show();
-    delay(50);
+    delay(20);
   }
-  delay(1000);
+  delay(500);
 }
 
 inline CRGB rand_new_star(int chance) {
@@ -36,7 +34,7 @@ inline CRGB rand_new_star(int chance) {
 
   int brightness = rand()%128+127;
 
-  return CHSV( hue, 255, brightness);
+  return CHSV( hue, 160, brightness);
 }
 
 ////////////////// Warp sequence ////////////////
@@ -44,20 +42,21 @@ inline CRGB rand_new_star(int chance) {
 #define MINSPEED 1
 #define MAXSPEED 40
 void warpspeed(bool decelerate) {
-  unsigned long initialtime, maxspeed, endpoint, cTime;
+  unsigned long initialtime, idletime, maxspeed, endpoint, cTime;
   int speed;
 
-  fill_solid( leds, LEDCOUNT, CRGB::Black ); // yellow
+  // fill_solid( leds, LEDCOUNT, CRGB::Black ); // yellow
   // Maybe scatter a few random stars around first?
 
   initialtime = millis();
-  maxspeed = initialtime + 30L*1000L;
-  endpoint = maxspeed + 30L*1000L;
+  idletime = initialtime + 5L*1000L;
+  maxspeed = initialtime + 20L*1000L;
+  endpoint = maxspeed + 5L*1000L;
 
   cTime = millis();
   while (cTime < endpoint) {
     // Shift all points away from us, by one:
-    for (int i=LEDCOUNT; i > 1; i--) {
+    for (int i=LEDCOUNT; i > 0; i--) {
       leds[i] = leds[i-1];
     }
 
@@ -66,7 +65,10 @@ void warpspeed(bool decelerate) {
 
     FastLED.show();
 
-    if (cTime >= maxspeed && cTime < endpoint) {
+    if (cTime <= idletime) {
+      speed = 0;
+    }
+    else if (cTime >= maxspeed && cTime < endpoint) {
       speed = MAXSPEED;
     }
     else if (cTime < maxspeed) {
@@ -74,10 +76,10 @@ void warpspeed(bool decelerate) {
     }
 
     if (decelerate) {
-      delay(50 - (MAXSPEED-speed));
+      delay(45 - (MAXSPEED-speed));
     }
     else {
-      delay(50 - speed);
+      delay(45 - speed);
     }
 
     cTime = millis();
@@ -91,18 +93,16 @@ void pulse() {
   for (bright=0; bright <= 255; bright++) {
     fill_solid( leds, LEDCOUNT, CHSV( 64, 255, bright) ); // yellow
     FastLED.show();
-    delay(15);
+    delay(8);
   }
 
   delay(750);
 
-  for (bright=255; bright >= 0; bright--) {
+  for (bright=254; bright >= 0; bright-=2) {
     fill_solid( leds, LEDCOUNT, CHSV( 64, 255, bright) ); // yellow
     FastLED.show();
-    delay(15);
+    delay(8);
   }
-
-  delay(750);
 }
 
 /////////// Twinkle effect /////////////
@@ -166,6 +166,7 @@ void twinkle(int duration) {
   }
 
   // TODO: Fade all out.
+  // Or not.. if left in, the warp mode works nicely.
 }
 
 /////////////////////////////////
@@ -190,6 +191,6 @@ void loop() {
   twinkle(10000);
   warpspeed(false);
   pulse();
-  warpspeed(true);
+  // warpspeed(true);
 }
 
