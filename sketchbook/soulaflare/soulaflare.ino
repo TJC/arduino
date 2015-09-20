@@ -158,7 +158,7 @@ void twinkle_iter() {
   delay(20);
 }
 
-void twinkle(int duration) {
+void twinkle(unsigned long duration) {
   unsigned long endpoint = millis() + duration;
 
   for (int i=0; i < LEDCOUNT; i++) {
@@ -201,7 +201,7 @@ void setup() {
 
 
 void loop() {
-  twinkle(10000);
+  twinkle(10000L);
   warpspeed(false);
   pulse();
   // warpspeed(true);
