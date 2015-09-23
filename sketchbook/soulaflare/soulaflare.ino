@@ -3,8 +3,11 @@
 #include <FastLED.h>
 // Was built against version 3.1
 
-#define LEDPIN 0
-#define LEDCOUNT 150
+#define LEDPIN   0
+#define LEDPIN2  1
+#define LEDCOUNT 210
+// Unused unless I go for non-mirroring:
+#define LEDS_PER_STRIP 210
 
 CRGB leds[LEDCOUNT+1];
 
@@ -17,22 +20,22 @@ void boot_up() {
     FastLED.show();
     delay(20);
   }
-  delay(500);
+  delay(2000);
 }
 
 inline CRGB rand_new_star(int chance) {
-  if (rand()%1000 > chance) {
+  if (random16(1000) > chance) {
     return CRGB::Black;
   }
 
   // Blue starts from around 150, goes up to 255 (red), drops back to zero and goes to 60 (orange)
   // So range of 165
-  int hue = rand()%165 + 150;
+  int hue = random16(150,315);
   if (hue > 255) {
     hue -= 255;
   }
 
-  int brightness = rand()%128+127;
+  int brightness = random8(128) + 127;
 
   return CHSV( hue, 160, brightness);
 }
@@ -49,9 +52,9 @@ void warpspeed(bool decelerate) {
   // Maybe scatter a few random stars around first?
 
   initialtime = millis();
-  idletime = initialtime + 5L*1000L;
-  maxspeed = initialtime + 20L*1000L;
-  endpoint = maxspeed + 5L*1000L;
+  idletime = initialtime + 10L*1000L;
+  maxspeed = initialtime + 60L*1000L;
+  endpoint = maxspeed + 2L*1000L;
 
   cTime = millis();
   while (cTime < endpoint) {
@@ -76,10 +79,10 @@ void warpspeed(bool decelerate) {
     }
 
     if (decelerate) {
-      delay(45 - (MAXSPEED-speed));
+      delay(50 - (MAXSPEED-speed));
     }
     else {
-      delay(45 - speed);
+      delay(50 - speed);
     }
 
     cTime = millis();
@@ -90,18 +93,20 @@ void warpspeed(bool decelerate) {
 
 void pulse() {
   int bright;
+  int hue = 64; // yellow
   for (bright=0; bright <= 255; bright++) {
-    fill_solid( leds, LEDCOUNT, CHSV( 64, 255, bright) ); // yellow
+    fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
     FastLED.show();
-    delay(8);
+    delay(9);
   }
 
-  delay(750);
+  delay(500);
 
-  for (bright=254; bright >= 0; bright-=2) {
-    fill_solid( leds, LEDCOUNT, CHSV( 64, 255, bright) ); // yellow
+  for (bright=255; bright >= 0; bright--) {
+    if (hue > 0) { hue--; } // fade to red
+    fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
     FastLED.show();
-    delay(8);
+    delay(5);
   }
 }
 
@@ -117,18 +122,18 @@ TwinkleStars tStars[LEDCOUNT];
 
 // Chance of starting a new twinkle (per tick, which is ~20ms)
 inline bool rand_new_led() {
-  return (rand()%1000 < 4);
+  return (random16(1000) < 4);
 }
 
 void twinkle_iter() {
   for (int i=0; i < LEDCOUNT; i++) {
     if (tStars[i].current == 0) {
-      int h = rand()%165 + 150;
+      int h = random16(150, 315);
       if (h > 255) { h -= 255; }
       if (rand_new_led()) {
         tStars[i].current = 1;
-        tStars[i].rate = 3 + rand()%5;
-        tStars[i].target = 96 + rand()%159;
+        tStars[i].rate = random8(3,8);
+        tStars[i].target = random8(96,255);
         tStars[i].hue = h;
       }
     }
@@ -172,9 +177,17 @@ void twinkle(int duration) {
 /////////////////////////////////
 
 void setup() {
+  delay(1000);
   randomSeed(analogRead(0));
+  random16_set_seed(analogRead(0));
 
+  // Just mirroring the two strands
   FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, LEDCOUNT);
+  FastLED.addLeds<NEOPIXEL, LEDPIN2>(leds, LEDCOUNT);
+
+  // Could do this for non-mirroring - offset+count
+  // FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, 0, LEDS_PER_STRIP);
+  // FastLED.addLeds<NEOPIXEL, LEDPIN2>(leds, LEDS_PER_STRIP, LEDS_PER_STRIP);
 
   // set to blank
   for (int i=0; i < LEDCOUNT; i++) {
