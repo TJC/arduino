@@ -91,22 +91,28 @@ void warpspeed(bool decelerate) {
 
 /////////////// Pulse effect /////////////
 
-void pulse() {
+void pulse(int hue, int times) {
   int bright;
-  int hue = 64; // yellow
-  for (bright=0; bright <= 255; bright++) {
-    fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
-    FastLED.show();
-    delay(9);
-  }
 
-  delay(500);
+  for (int i=0; i < times; i++) {
+    for (bright=0; bright <= 255; bright++) {
+      fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
+      FastLED.show();
+      FastLED.delay(9);
+    }
 
-  for (bright=255; bright >= 0; bright--) {
-    if (hue > 0) { hue--; } // fade to red
-    fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
-    FastLED.show();
-    delay(5);
+    FastLED.delay(500);
+
+    for (bright=255; bright >= 0; bright--) {
+      if (hue > 0) { hue--; } // fade to red
+      fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
+      FastLED.show();
+      FastLED.delay(5);
+    }
+
+    if (times > 0) {
+      FastLED.delay(500);
+    }
   }
 }
 
@@ -201,9 +207,7 @@ void setup() {
 
 
 void loop() {
+  pulse(64, 1);
   twinkle(10000L);
   warpspeed(false);
-  pulse();
-  // warpspeed(true);
 }
-

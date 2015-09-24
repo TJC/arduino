@@ -23,43 +23,51 @@ void boot_up() {
     hue = (i * 4)%256;
     leds[i] = CHSV(hue, 255, 128);
     FastLED.show();
-    delay(20);
+    FastLED.delay(5);
   }
   delay(2000);
 }
 
 /////////////// Pulse effect /////////////
 
-void pulse() {
+void pulse(int times) {
   int bright;
   int hue;
   int delta;
   int final_hue;
-  int colour_mode = rand()%2;
-  switch (colour_mode) {
-    case 0: hue = 160; delta=0; break;
-    case 1: hue = 64; delta = -1; break;
+
+  switch (rand()%3) {
+    case 0: hue = 160; delta=0; break; // straight blue
+    case 1: hue = 65; delta = -1; break; // yellow to red
+    case 2: hue = 96; delta = 1; break; // green to blue
   }
 
-  for (bright=0; bright <= 255; bright++) {
-    final_hue = hue;
-    if (bright > 190) {
-      final_hue +=  delta * (bright - 191);
+  for (int i=0; i < times; i++) {
+    for (bright=0; bright <= 255; bright++) {
+      final_hue = hue;
+      if (bright > 190) {
+        final_hue +=  delta * (bright - 191);
+      }
+      fill_solid( leds, LEDCOUNT, CHSV( final_hue, 255, ease8InOutCubic(bright) ) );
+      FastLED.show();
+      FastLED.delay(12);
     }
-    fill_solid( leds, LEDCOUNT, CHSV( final_hue, 255, ease8InOutCubic(bright) ) );
-    FastLED.show();
-    delay(8);
+
+    for (bright=255; bright >= 0; bright--) {
+      final_hue = hue;
+      if (bright > 190) {
+        final_hue +=  delta * (bright - 191);
+      }
+      fill_solid( leds, LEDCOUNT, CHSV( final_hue, 255, ease8InOutCubic(bright) ) );
+      FastLED.show();
+      FastLED.delay(8);
+    }
+
+    if (times > 1) {
+      FastLED.delay(500);
+    }
   }
 
-  for (bright=254; bright >= 0; bright-=2) {
-    final_hue = hue;
-    if (bright > 190) {
-      final_hue +=  delta * (bright - 191);
-    }
-    fill_solid( leds, LEDCOUNT, CHSV( final_hue, 255, ease8InOutCubic(bright) ) );
-    FastLED.show();
-    delay(8);
-  }
 }
 
 /////////// Twinkle effect /////////////
@@ -110,7 +118,7 @@ void twinkle_iter() {
   delay(20);
 }
 
-void twinkle(int duration) {
+void twinkle(unsigned long duration) {
   unsigned long endpoint = millis() + duration;
 
   for (int i=0; i < LEDCOUNT; i++) {
@@ -148,15 +156,15 @@ void setup() {
   }
 
   FastLED.show();
-  delay(2000);
+  FastLED.delay(5000);
 
   boot_up();
 }
 
 
 void loop() {
-  pulse();
-  twinkle(10000);
+  pulse(1);
+  pulse(7);
+  twinkle(30000L);
   // warpspeed(false);
 }
-
