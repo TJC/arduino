@@ -21,21 +21,24 @@ void boot_up() {
 
 /////////////// Pulse effect /////////////
 
-void pulse() {
+void pulse(int hue) {
   int bright;
-  for (bright=0; bright <= 255; bright++) {
-    fill_solid( leds, LEDCOUNT, CHSV( 64, 255, bright) ); // yellow
-    FastLED.show();
-    delay(6);
-  }
 
-  delay(750);
+    for (bright=0; bright <= 255; bright++) {
+      fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
+      FastLED.show();
+      FastLED.delay(9);
+    }
 
-  for (bright=254; bright >= 0; bright-=2) {
-    fill_solid( leds, LEDCOUNT, CHSV( 64, 255, bright) ); // yellow
-    FastLED.show();
-    delay(6);
-  }
+    FastLED.delay(500);
+
+    for (bright=255; bright >= 0; bright--) {
+      if (hue > 0) { hue--; } // fade to red
+      fill_solid( leds, LEDCOUNT, CHSV( hue, 255, ease8InOutCubic(bright) ) );
+      FastLED.show();
+      FastLED.delay(5);
+    }
+
 }
 
 /////////// Twinkle effect /////////////
@@ -50,18 +53,18 @@ TwinkleStars tStars[LEDCOUNT+1];
 
 // Chance of starting a new twinkle (per tick, which is ~20ms)
 inline bool rand_new_led() {
-  return (rand()%1000 < 7);
+  return (random16(1000) < 7);
 }
 
 void twinkle_iter() {
   for (int i=0; i < LEDCOUNT; i++) {
     if (tStars[i].current == 0) {
-      int h = rand()%165 + 150;
+      int h = random16(150, 315);
       if (h > 255) { h -= 255; }
       if (rand_new_led()) {
         tStars[i].current = 1;
-        tStars[i].rate = 3 + rand()%5;
-        tStars[i].target = 96 + rand()%159;
+        tStars[i].rate = random8(3,8);
+        tStars[i].target = random8(96,255);
         tStars[i].hue = h;
       }
     }
@@ -83,7 +86,7 @@ void twinkle_iter() {
 
   FastLED.show();
 
-  delay(20);
+  FastLED.delay(20);
 }
 
 void twinkle(unsigned long duration) {
@@ -105,27 +108,41 @@ void twinkle(unsigned long duration) {
 /////////////////////////////////
 
 void setup() {
+  delay(1000);
   randomSeed(analogRead(0));
+  random16_set_seed(analogRead(0));
 
-  // all led counts +1 for paranoia
-  FastLED.addLeds<NEOPIXEL, 4>(leds, 6);
-  FastLED.addLeds<NEOPIXEL, 5>(&leds[6], 10); 
-  FastLED.addLeds<NEOPIXEL, 6>(&leds[16], 6);
-  FastLED.addLeds<NEOPIXEL, 7>(&leds[22], 9);
+  // all led counts +1 for paranoia and possible miscounting
+  FastLED.addLeds<NEOPIXEL, 4>(leds,  0,  6);
+  FastLED.addLeds<NEOPIXEL, 5>(leds,  6, 10); 
+  FastLED.addLeds<NEOPIXEL, 6>(leds, 16,  6);
+  FastLED.addLeds<NEOPIXEL, 7>(leds, 22,  9);
 
-  // set to blank
-  for (int i=0; i < LEDCOUNT; i++) {
-    leds[i].setRGB(0,0,0);
+  // set to test pattern per strand
+  for (int i=0; i < 6; i++) {
+    leds[i].setRGB(255,0,0);
+  }
+  for (int i=6; i < 16; i++) {
+    leds[i].setRGB(0,255,0);
+  }
+  for (int i=16; i < 22; i++) {
+    leds[i].setRGB(0,0,255);
+  }
+  for (int i=22; i < LEDCOUNT; i++) {
+    leds[i].setRGB(192,0,192);
   }
 
   FastLED.show();
+  FastLED.delay(5000);
 
   boot_up();
 }
 
-
+int pulseColours[] = {64, 96, 160, 192, 255};
 void loop() {
-  pulse();
+  pulse(64);
+  twinkle(60000L);
+  pulse(pulseColours[random8(5)]);
   twinkle(60000L);
 }
 
