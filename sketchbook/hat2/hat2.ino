@@ -25,11 +25,12 @@ inline CRGB rand_new_star(int chance) {
     return CRGB::Black;
   }
 
-  int hue = random8(159, 255);
+  //int hue = random8(159, 255);
+  int hue = random8(0, 255);
 
   int brightness = random8(128,255);
 
-  return CHSV( hue, 160, brightness);
+  return CHSV( hue, 255, brightness);
 }
 
 ////////////////// Warp sequence ////////////////
@@ -127,8 +128,8 @@ inline bool rand_new_led() {
 void twinkle_iter() {
   for (int i=0; i < LEDCOUNT; i++) {
     if (tStars[i].current == 0) {
-      int h = random16(150,315);
-      if (h > 255) { h -= 255; }
+      int h = random16(0,255);
+
       if (rand_new_led()) {
         tStars[i].current = 1;
         tStars[i].rate = random8(3,8);
@@ -149,12 +150,12 @@ void twinkle_iter() {
   }
 
   for (int i=0; i < LEDCOUNT; i++) {
-    leds[i] = CHSV(tStars[i].hue, 128, tStars[i].current);
+    leds[i] = CHSV(tStars[i].hue, 255, tStars[i].current);
   }
 
   FastLED.show();
 
-  delay(20);
+  FastLED.delay(20);
 }
 
 void twinkle(unsigned long duration) {
@@ -198,7 +199,7 @@ void loop() {
   twinkle(20000L);
   warpspeed(false);
   pulse(random8(64,255), 1);
-  FastLED.setBrightness(64);
-  pulse(0, 16);
-  FastLED.setBrightness(64);
+  FastLED.setBrightness(48);
+  pulse(0, 8);
+  FastLED.setBrightness(255);
 }
