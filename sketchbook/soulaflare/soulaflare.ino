@@ -23,6 +23,41 @@ void boot_up() {
   delay(2000);
 }
 
+///////////// Cylon ////////////
+void fadeall() {
+  for(int i = 0; i < LEDCOUNT; i++) {
+    leds[i].nscale8(250);
+  }
+}
+
+void cylon_iter() {
+  // First slide the led in one direction
+  for(int i = 0; i < LEDCOUNT; i++) {
+    leds[i] = CRGB::Red;
+    FastLED.show();
+    fadeall();
+    FastLED.delay(10);
+  }
+
+  // Now go in the other direction.
+  for(int i = LEDCOUNT-1; i >= 0; i--) {
+    leds[i] = CRGB::Red;
+    FastLED.show();
+    fadeall();
+    FastLED.delay(10);
+  }
+}
+
+void cylon(unsigned long duration) {
+  unsigned long endpoint = millis() + duration;
+
+  while (millis() < endpoint) {
+    cylon_iter();
+  }
+}
+
+////////////////// Warp sequence ////////////////
+
 inline CRGB rand_new_star(int chance) {
   if (random16(1000) > chance) {
     return CRGB::Black;
@@ -39,8 +74,6 @@ inline CRGB rand_new_star(int chance) {
 
   return CHSV( hue, 160, brightness);
 }
-
-////////////////// Warp sequence ////////////////
 
 #define MINSPEED 1
 #define MAXSPEED 40
@@ -208,6 +241,7 @@ void setup() {
 
 void loop() {
   pulse(64, 1);
-  twinkle(10000L);
+  cylon(30000L);
+  twinkle(60000L);
   warpspeed(false);
 }
