@@ -45,22 +45,22 @@ void pulse(int times) {
   for (int i=0; i < times; i++) {
     for (bright=0; bright <= 255; bright++) {
       final_hue = hue;
-      if (bright > 190) {
+      if (bright >= 191) {
         final_hue +=  delta * (bright - 191);
       }
       fill_solid( leds, LEDCOUNT, CHSV( final_hue, 255, ease8InOutCubic(bright) ) );
       FastLED.show();
-      FastLED.delay(12);
+      FastLED.delay(13);
     }
 
     for (bright=255; bright >= 0; bright--) {
       final_hue = hue;
-      if (bright > 190) {
+      if (bright >= 191) {
         final_hue +=  delta * (bright - 191);
       }
       fill_solid( leds, LEDCOUNT, CHSV( final_hue, 255, ease8InOutCubic(bright) ) );
       FastLED.show();
-      FastLED.delay(8);
+      FastLED.delay(9);
     }
 
     if (times > 1) {
