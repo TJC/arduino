@@ -5,7 +5,7 @@
 
 #define LEDPIN   0
 #define LEDPIN2  1
-#define LEDCOUNT 210
+#define LEDCOUNT 420
 // Unused unless I go for non-mirroring:
 #define LEDS_PER_STRIP 210
 
@@ -18,7 +18,7 @@ void boot_up() {
     hue = (i * 4)%256;
     leds[i] = CHSV(hue, 255, 128);
     FastLED.show();
-    delay(20);
+    delay(10);
   }
   delay(2000);
 }
@@ -26,22 +26,24 @@ void boot_up() {
 ///////////// Cylon ////////////
 void fadeall() {
   for(int i = 0; i < LEDCOUNT; i++) {
-    leds[i].nscale8(250);
+    leds[i].nscale8(240);
   }
 }
 
 void cylon_iter() {
   // First slide the led in one direction
-  for(int i = 0; i < LEDCOUNT; i++) {
+  for(int i = 0; i < LEDS_PER_STRIP; i++) {
     leds[i] = CRGB::Red;
+    leds[i+LEDS_PER_STRIP] = CRGB::Red;
     FastLED.show();
     fadeall();
     FastLED.delay(10);
   }
 
   // Now go in the other direction.
-  for(int i = LEDCOUNT-1; i >= 0; i--) {
+  for(int i = LEDS_PER_STRIP-1; i >= 0; i--) {
     leds[i] = CRGB::Red;
+    leds[i+LEDS_PER_STRIP] = CRGB::Red;
     FastLED.show();
     fadeall();
     FastLED.delay(10);
@@ -189,7 +191,7 @@ void twinkle_iter() {
   }
 
   for (int i=0; i < LEDCOUNT; i++) {
-    leds[i] = CHSV(tStars[i].hue, 128, tStars[i].current);
+    leds[i] = CHSV(tStars[i].hue, 160, tStars[i].current);
   }
 
   FastLED.show();
@@ -221,12 +223,12 @@ void setup() {
   random16_set_seed(analogRead(0));
 
   // Just mirroring the two strands
-  FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, LEDCOUNT);
-  FastLED.addLeds<NEOPIXEL, LEDPIN2>(leds, LEDCOUNT);
+  //FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, LEDCOUNT);
+  //FastLED.addLeds<NEOPIXEL, LEDPIN2>(leds, LEDCOUNT);
 
   // Could do this for non-mirroring - offset+count
-  // FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, 0, LEDS_PER_STRIP);
-  // FastLED.addLeds<NEOPIXEL, LEDPIN2>(leds, LEDS_PER_STRIP, LEDS_PER_STRIP);
+  FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, 0, LEDS_PER_STRIP);
+  FastLED.addLeds<NEOPIXEL, LEDPIN2>(leds, LEDS_PER_STRIP, LEDS_PER_STRIP);
 
   // set to blank
   for (int i=0; i < LEDCOUNT; i++) {
@@ -241,7 +243,10 @@ void setup() {
 
 void loop() {
   pulse(64, 1);
-  cylon(30000L);
+  twinkle(60000L);
+  pulse(64, 1);
+  cylon(60000L);
+  pulse(255, 1);
   twinkle(60000L);
   warpspeed(false);
 }
