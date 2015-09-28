@@ -141,8 +141,8 @@ void setup() {
 int pulseColours[] = {64, 96, 160, 192, 255};
 void loop() {
   pulse(64);
-  twinkle(60000L);
+  twinkle(120000L);
   pulse(pulseColours[random8(5)]);
-  twinkle(60000L);
+  twinkle(120000L);
 }
 
