@@ -10,3 +10,6 @@
 [submodule "submodules/FastLED"]
 	path = submodules/FastLED
 	url = https://github.com/FastLED/FastLED.git
+[submodule "submodules/Anglerfish"]
+	path = submodules/Anglerfish
+	url = git@github.com:TJC/Deep-Sea-Angling-LED.git
