@@ -3,7 +3,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #define NEOPIN 8
-#define LEDCOUNT 150
+#define LEDCOUNT 64
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LEDCOUNT, NEOPIN, NEO_GRB + NEO_KHZ800);
 // strip.setPixelColor(i, c)
@@ -33,7 +33,7 @@ void setup() {
 
 // Chance of starting a new twinkle (per tick, which is ~20ms)
 bool rand_new_led() {
-  return (rand()%1000 < 4);
+  return (rand()%1000 < 6);
 }
 
 void loop() {
@@ -41,9 +41,9 @@ void loop() {
     if (ledItems[i].current == 0) {
       if (rand_new_led()) {
         ledItems[i].current = 1;
-        ledItems[i].rate = 3 + rand()%5;
+        ledItems[i].rate = 3 + rand()%7;
         ledItems[i].target = 96 + rand()%159;
-        ledItems[i].cOffset = -30 + ( rand() % 60 );
+        ledItems[i].cOffset = -60 + ( rand() % 120 );
       }
     }
     else {
@@ -61,16 +61,17 @@ void loop() {
 
   for (int i=0; i < LEDCOUNT; i++) {
     int16_t blue = ledItems[i].current;
-    int16_t redgreen = ledItems[i].current;
+    int16_t red = ledItems[i].current;
+    int16_t green = ledItems[i].current;
     if (ledItems[i].cOffset > 0) {
-      redgreen -= ledItems[i].cOffset;
+      red -= ledItems[i].cOffset;
     }
     else if (ledItems[i].cOffset < 0) {
       blue += ledItems[i].cOffset;
     }
     if (blue < 0) { blue = 0; }
-    if (redgreen < 0) { redgreen = 0; }
-    uint32_t c = strip.Color(redgreen, redgreen, blue);
+    if (red < 0) { red = 0; }
+    uint32_t c = strip.Color(red, green, blue);
     strip.setPixelColor(i, c);
   }
 
