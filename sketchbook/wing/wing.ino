@@ -156,6 +156,39 @@ void start_fire(unsigned long duration) {
   }
 }
 
+void left_stripe() {
+  int j = 31;
+
+  for (int i=11; i <= 20; i++) {
+    fill_solid( leds, LEDCOUNT, CRGB::Black );
+    leds[i].setRGB(0,0,255);
+    leds[j--].setRGB(0,0,255);
+    FastLED.show();
+    FastLED.delay(60);
+  }
+}
+
+void right_stripe() {
+   int j = 9;
+
+  for (int i=32; i <= 41; i++) {
+    fill_solid( leds, LEDCOUNT, CRGB::Black );
+    leds[i].setRGB(0,0,255);
+    leds[j--].setRGB(0,0,255);
+    FastLED.show();
+    FastLED.delay(60);
+  }
+}
+
+void blue_stripes() {
+  FastLED.setBrightness(128);
+  for (int i=0; i < 40; i++) {
+    left_stripe();
+    right_stripe();
+  }
+  FastLED.setBrightness(48);
+}
+
 
 void setup() {
   delay(1000);
@@ -213,6 +246,8 @@ void red_glow(unsigned long duration) {
 
 void loop() {
     start_fire(180000);
-    red_glow(60000);
+    blue_stripes();
+    red_glow(90000);
+    blue_stripes();
 }
 
