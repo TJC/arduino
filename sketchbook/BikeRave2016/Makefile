@@ -3,7 +3,9 @@
 BOARD_TAG = nano328
 ARDUINO_PORT = $(wildcard /dev/ttyUSB*)
 # Libs are in $(ARDUINO_DIR)/hardware/libraries
-ARDUINO_LIBS = 
+ARDUINO_LIBS = FastLED
+USER_LIB_PATH = /home/tjc/git/arduino/sketchbook/libraries/
+
 
 # RESET_CMD = python -c "from serial import Serial;from time import sleep;s=Serial('$(ARDUINO_PORT)', 57600);sleep(0.25);s.close();s.open();sleep(0.25);s.close();s.setBaudrate(1200);s.open();sleep(0.25);s.close();sleep(1);"
 RESET_CMD="/bin/true"
